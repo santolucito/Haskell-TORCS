@@ -25,27 +25,33 @@ Another example is Ivory, a functional language that compiles directly to C code
 This language still provides access to the low level operations necessary for embedded system programming, but still enforces good programming practice, such as disallowing pointer arithmetic, with a rich type system.
 %TODO include ref to {Kansas Lava}
 
-%when applying FP to reactive systems we have trouble
+%when applying FP to reactive systems purity is hard
 However, despite these advantages of functional programming, there are some difficulties when applying this approach to reactive systems.
 One difficulty with can be the insistence on purity, which separates data manipulation code from sources of unknown data, such as IO.
 Since reactive systems require a constant interaction between the environment and the agent, purity is sometimes seen as an obstacle.
 
+%also there are many types of time
+Furthermore, reactive systems require a consistent notion of time, communication, and actions.
+For example, it is sometimes necessary to control a vehicle as an isolated agent, but it is also desirable to platoon a group a vehicles.
+This requires opening communication channels between vehicles, introducing the rate of sensing and a rate of communication.
+There may also be a need to have both continuous and discrete time behaviors.
+In a car, the steering wheel should act as a continuous signal, but a human-in-the-loop system~\cite{li2014synthesis} should additionally respond to discrete user actions, such as turning on a directional.
+Functional Reactive Programming achieves this by creating an abstraction of time on the type level that allows for both continuous and discrete behaviors.
+%  motivate on some example (synchronous vs asynchronous, real vs discrete),
+
 %but FRP can help us
 A solution to this problem is to use a paradigm called Functional Reactive Programming (FRP)~\cite{hudak2003arrows,hudak2000haskell}.
-FRP uses abstractions of computations available in functional languages (\eg monads, arrows, applicative) to allow for a separation between 
-In fact, as we will see, the ability to separate types of computations can be helpful in building reactive system that can be easily analyzed.
-wing the original definition by Agrawal et al.[2] the problem of association rule mining is defined as:
-Furthermore, reactive systems require a consistent notion of time.
-Functional Reactive Programming achieves this by creating an abstraction of time on the type level
-  motivate on some example (synchronous vs asynchronous, real vs
-  discrete), finally lead to FRP
+FRP uses abstractions of computations available in functional languages (\eg monads, arrows, applicatives) to allow for a separation between environment handling and computation.
+This separation makes functional languages powerful in a number of different reactive settings.
+In fact, the ability to separate types of computations can also be helpful in building reactive system that are easily analyzed.
+
 
 %we will explain FRP in depth in the sequel
 In summary, we make the following contributions:
 
 \begin{itemize}
 \item An overview of Functional Reactive Programming (FRP) and how it allows for easier reasoning about correctness properties in reactive systems. 
-\cfelix{this is the most important part, almost sure that nobody of the reviews will know about; go through the very basics, remember these are embedded systems people}
+%\cfelix{this is the most important part, almost sure that nobody of the reviews will know about; go through the very basics, remember these are embedded systems people}
 
 \item A library for connecting Haskell to the vehicle simulator TORCS, encouraging further research into the use of functional languages for the development of safer autonomous vehicle controllers.
 

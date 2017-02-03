@@ -1,6 +1,7 @@
 \section{Related Work}
 
-TORCS was used by ~\cite{kamali2016formal} as a simulator for formal verification of platoons.
+TORCS has been used as a simulator for formal verification of platoons~\cite{kamali2016formal}, etc...
+None of these works have used FRP as the language for the controller.
 
 
 FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zou2016}.
@@ -11,3 +12,9 @@ To the best of our knowledge this is the first FRP-based vehicle simulator.
 Although there are many bindings to various vehicle simulators, these tend to use imperative languages.
 For instance, TORCS allows users to direct edit the package and add a new car in C++.
 There are also a few TORCS bindings for python, which have been notably used in the TORCS competition.
+
+The videogame GTA~\cite{} has also been used to train image recognition software for autonomous vehicles~\cite{}.
+While GTA is professionally produced game, which has more attractive graphics and a more advanced physics engine, this suffers from two problems.
+First, is that as proprietary software, the ability to build sensor based controllers is more restricted. 
+Furthermore, unlike TORCS, which is designed primarily as a vehicle simulator, GTA's physics engine is tuned to maximize entertainment.
+Using GTA as a meaningful simulator would then be valuable work, but we leave this to future explorations.

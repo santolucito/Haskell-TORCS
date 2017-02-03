@@ -2,26 +2,82 @@
 
 \subsection{Preliminaries}
 
+One of the classic approaches to build reactive systems is to use a call-back framework, that can be embedded inside a loop.
+The call-back can be used to query the state of value, or to change that value.
+With FRP, we instead introduce an abstractions of time that allow the programmer to directly manipulate some time-varying value.
+This key abstraction is called a \textit{signal}, and has the following type:
+
+\begin{lstlisting}
+type Signal a = Time -> a
+\end{lstlisting}
+
+A signal is then a function that relates time to some value.
+For example, the type \texttt{Signal Image} would then be video data, and \texttt{Signal Steer} would be the way a steering wheel is operated over time.
+With signals, FRP also introduces the abstraction of a \textit{signal function (SF)}.
+This is a transformer from one signal to another.
+
+\begin{lstlisting}
+type SF a b = Signal a -> Signal b
+\end{lstlisting}
+
+Using the previous signals, we can then introduce a type for a steering function that operates based on a video stream as \texttt{turn :: SF Image Steer}.
+This function will process video and use it to decide how to steer.
+We omit an implementation, as the details of the data transformation are not relevant to the structure of the FRP code.
+
+There are many types of FRP based on different abstractions.
+Many libraries use the monad abstraction to handle signal processing~\cite{monadFRP1,monadFRP2}.
+We will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}.
+Yampa is fundamentally less expressive than a monadic FRP.
+This can be beneficial because the more restrictive our languages, the less likely it is for a programmer to make a mistake.
+As we will see in the sequel, Yampa is still powerful enough to write a controller to drive an autonomous vehicle.
+At the same time, the style is also syntactically clear accessible to make for an easy introduction to the FRP paradigm.
+
+In arrowized FRP, Haskell provides an special syntax called ArrowNotation.
+This is a composition environment, in which the programmer only manages the composition of arrow functions.
+Inputs are read in from the right hand side, and piped to the left hand side.
+
+\begin{lstlisting}
+myDriver :: SF Image Steer
+myDriver = proc image -> do
+  basicSteer    <-     turn  -< image
+  adjustedSteer <- arr avoid -< (image,basicSteer)
+  returnA -< adjustedSteer
+\end{lstlisting}
+
+In this example, we introduce a new function \texttt{avoid :: (Image,Steer) -> Steer}, that will adjust our basic steering plan based on the image to avoid any obstacles.
+In the above example, this function is lifted to the signal level using \texttt{arr :: (a -> b) -> SF a b}.
+Since \texttt{turn} was already on the signal level, we did not need to apply the lifting function.
+
+We can also imagine that our function to avoid obstacles requires two images to calculate the adjusted steering command.
+This might be to filter noise in the image, or to calculate the velocity of an approaching obstacle.
+In this case, we will need to save the previous state of the image for the next processing turn.
+This can be achieved by using a recursive arrow. 
+Eliding the technical details for the purposes of this presentation, the syntax looks as follows:
+
+\begin{lstlisting}
+myDriver :: SF Image Steer
+myDriver = proc image -> do
+  rec
+    oldI          <- iPre null -< image
+    basicSteer    <-     turn  -< image
+    adjustedSteer <- arr avoid -< (image,oldI,basicSteer)
+  returnA -< adjustedSteer
+\end{lstlisting}
+
+The function \texttt{iPre} will take some initial state, in this case a null image, and save images for one time step each time it is processed.
+This creates a type of feedback loop that is then used in the updated \texttt{avoid} function.
+The \texttt{rec} keyword is used to denote a section of arrow code that has a mutual dependency.
+Without the keyword, there would be an unresolvable dependency loop in the code.
 
 \subsection{Case Study : Driving}
 A driver observes the environment and changes the drive state over time.
 This is represented as a \textit{signal function (SF)} in Yampa.
 
 \begin{lstlisting}
-type Driver = SF (Event CarState) DriveState
+type Driver = SF CarState DriveState
 \end{lstlisting}
 
-We then can create a driver, where the functions for shifting, steering, and accelerating are provided elsewhere in the code base.
-
-\begin{lstlisting}
-myDriver :: Driver
-myDriver = proc e -> do
-  CarState{..} <- arr getE -< e
-  g <- arr shifting -< speedX
-  s <- arr steering -< (angle,trackPos)
-  a <- arr gas -< (speedX,s)
-  returnA -< defaultDriveState {accel = a, gear = g, steer = s}
-\end{lstlisting}
+We then can create a driver as shown in Listing~\ref{lst:driver}
 
 One major advantage of FRP is separation of control flow and data level manipulation. 
 This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
@@ -29,17 +85,22 @@ For example, the user may only be concerned with verifying that their steering c
 The user then only needs to verify the \texttt{steering} function in isolation from all other code.
 This is a pure function, as evidenced by the type signature, which produces a new steering value based on the angle relative to the edges of the track and position on the track (where 0 is centered between the edges, and 1 is the left wall).
 
-\begin{lstlisting}
-targetSpeed = 100
+%\begin{minipage}{\linewidth}
+\begin{lstlisting}[float,floatplacement=HR,caption=A complete basic controller in Yampa, label=lst:driver]
+myDriver :: Driver
+myDriver = proc CarState{..} -> do
+  rec 
+    oldG <- iPre 0 -< g
+    g <- arr shifting -< (rpm,oldG)
+    s <- arr steering -< (angle,trackPos)
+    a <- arr gas -< (speedX,s)
+  returnA -< defaultDriveState {accel = a, gear = g, steer = s}
 
 shifting :: Double -> Int
-shifting s = if 
-  | s > 170 -> 6
-  | s > 140 -> 5
-  | s > 110 -> 4
-  | s > 80 -> 3
-  | s > 50 -> 2
-  | s <= 50 -> 1
+shifting (rpm,g) = if 
+  | rpm > 6000 -> min 6 (g+1)
+  | rpm < 2000 -> max 1 (g-1)
+  | otherwise  -> g
  
 steering :: (Double,Double) -> Double
 steering (spd,trackPos) = let
@@ -49,10 +110,12 @@ steering (spd,trackPos) = let
  in
   clip centering
   
+targetSpeed = 100
 gas :: (Double,Double) -> Double
 gas (speed,steer) = 
-  if speed < (targetSpeed-(steer*50)) then 0.5 else 0
+  if speed < (targetSpeed-(steer*50)) then 1 else 0
 \end{lstlisting}
+%\end{minipage}
 
 The above is the entirety of the code needed for a basic controller that can successfully navigate a vehicle in track shown in Fig.~\ref{fig:race}.
 \cmark{TODO should I include the python controller that does the same thing but is more complicated code?}

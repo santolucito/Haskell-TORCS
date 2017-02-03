@@ -75,13 +75,15 @@ fromByteString s = let
   fs = filter (/="") fs' :: [ByteString]
   ps = map (B.span (/=' ')) fs :: [(ByteString,ByteString)]
   fieldMap = M.fromList ps
-  getField s = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" s fieldMap
+  getField' s =  B.filter (/=' ') $ M.findWithDefault "" s fieldMap
+  getField s = readAsDouble $ getField' s
  in
-  traceMe defaultCarState 
+  defaultCarState 
      {angle = getField "angle", 
       speedX = getField "speedX", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
+      gear' =  traceShow ps $ fromMaybe 0 $ fmap fst$ B.readInt "gear", 
       fuel = getField "fuel", 
       trackPos = getField "trackPos",
       damage = getField "damage"}
@@ -92,7 +94,7 @@ readAsDouble :: ByteString -> Double
 readAsDouble s = let
   neg = B.head s == '-'
   s' = if neg then B.tail s else s
-  (decPart, fracPart) = traceMe $ B.span (/='.') s'
+  (decPart, fracPart) = B.span (/='.') s'
   f = fromIntegral. fromMaybe 0. fmap fst. B.readInt
   frac = if B.length fracPart > 0 
     then (f $ B.tail fracPart) / (fromIntegral $ 10^(B.length $ B.tail fracPart))
