@@ -198,7 +198,6 @@ class Client():
         if not self.so: return
         if self.debug: print self.R
         try:
-            print repr(self.R)
             self.so.sendto(repr(self.R), (self.host, self.port))
         except socket.error, emsg:
             print "Error sending to server: %s Message %s" % (emsg[1],str(emsg[0]))
@@ -333,7 +332,7 @@ def drive_example(c):
         R['gear']=6
     
     print ""
-    #print json.dumps(S)
+    print repr(S)
     #print repr(R)
     print ""
     return

@@ -5,7 +5,7 @@ name:                TORCS
 version:             0.1.0.0
 -- synopsis:            
 -- description:         
-license:             BSD3
+license:             GPL
 license-file:        LICENSE
 author:              Mark Santolucito
 maintainer:          mark.santolucito@yale.edu
@@ -16,7 +16,9 @@ extra-source-files:  ChangeLog.md, README
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Main
+  exposed-modules:     
+     TORCS
+   , TORCS.Types
   -- other-modules:       
   other-extensions:    Arrows, OverloadedStrings
   build-depends:       base >=4.9 && <4.10, 
@@ -24,5 +26,9 @@ library
                        bytestring >=0.10 && <0.11, 
                        network >=2.6 && <2.7, 
                        Yampa >=0.10 && <0.11
-  hs-source-dirs:      src
   default-language:    Haskell2010
+  ghc-options: 
+    -Wall 
+    -O2 
+   -- "-with-rtsopts= -s -h -i0.1"
+
