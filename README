@@ -1,0 +1,18 @@
+
+TODO
+
+make cabal package
+
+make datatype for output
+make show instance for output
+
+make datatype for input
+make read isntacne for input
+
+write controller for single car
+
+write paper (with nice colorful screenshot)
+
+write controller for platoon
+
+write more paper
