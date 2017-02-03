@@ -1,3 +1,17 @@
 \section{Implementation}
 
-Basically, just Haskell bindings to TORCS.
+TORCS is an existing vehicle simulator.
+It has been used in autonomous vehicle competitions.
+For these competitions, a car can be controller via a socket that sends the sensor data from the vehicle and can receive and process the driving commands.
+
+While there are many bindings to these socket protocols for languages such as python~\cite{x,y,z}, we are the first such binding for Haskell.
+This is likely due in part to the unique style of programming that is required for streaming socket programming in Haskell due to its purity.
+With the assistance of FRP, we solved this problem in a principled way that allows users to manipulated sensor data in a transparent and structured way.
+
+
+Although the existing tool is specifically tailored to be used with our controller using the Yampa library,
+  minor modifications can allow the tool to easily work with other FRP libraries.
+
+It may also be interesting to build more lower level binding to allow non-FRP Haskell program to interface with TORCS.
+While FRP is one of the simplest interfaces for reactive systems programming in functional languages, it is also possible to use functional language in this context without FRP.
+
