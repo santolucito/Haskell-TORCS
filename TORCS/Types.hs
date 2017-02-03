@@ -1,11 +1,17 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 module TORCS.Types where
 
 import Data.ByteString (ByteString)
-import Data.ByteString.Char8 (pack)
+import qualified Data.ByteString.Char8 as B
+import qualified Data.Map as M
+import Data.Maybe 
 
 import FRP.Yampa
+
+import Debug.Trace
+
 -- | A driver observes the environment and changes the drive state
 type Driver = SF (Event CarState) DriveState
 
@@ -18,10 +24,10 @@ data DriveState = DriveState {
   ,meta   :: Double
   ,break :: Double
   ,steer  :: Double
-}
+} deriving (Show)
 
 toByteString :: DriveState -> ByteString
-toByteString DriveState{..} = pack $
+toByteString DriveState{..} = B.pack $
   "(gear " ++(show gear)++")"++
   "(clutch "++(show clutch)++")"++
   "(focus "++(show focus)++")"++
@@ -44,7 +50,7 @@ defaultDriveState = DriveState {
 data CarState = CarState {
    z   :: Double
   ,angle  :: Double
-  ,gear  :: Int
+  ,gear'  :: Int
   ,trackPos  :: Double
   ,speedY :: Double
   ,distRaced :: Double
@@ -61,16 +67,39 @@ data CarState = CarState {
   ,opponents :: [Double] -- maybe distance from me?
   ,rpm   :: Double
   ,lastLapTime :: Double
-}
+} deriving (Show)
 
 fromByteString :: ByteString -> CarState 
-fromByteString s =
-  defaultCarState
+fromByteString s = let
+  fs' = B.splitWith (\c -> c==')' || c=='(') s
+  fs = filter (/="") fs' :: [ByteString]
+  ps = map (B.span (/=' ')) fs :: [(ByteString,ByteString)]
+  fieldMap = M.fromList ps
+  a = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "angle" fieldMap 
+  spx = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "speedX" fieldMap 
+  trackPos = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "trackPos" fieldMap 
+ in
+  traceMe defaultCarState {angle = a, speedX = spx, trackPos = trackPos}
+
+traceMe x = traceShow x x 
+-- TODO some has to have a better way of doing this
+readAsDouble :: ByteString -> Double
+readAsDouble s = let
+  neg = B.head s == '-'
+  s' = if neg then B.tail s else s
+  (decPart, fracPart) = traceMe $ B.span (/='.') s'
+  f = fromIntegral. fromMaybe 0. fmap fst. B.readInt
+  frac = if B.length fracPart > 0 
+    then (f $ B.tail fracPart) / (fromIntegral $ 10^(B.length $ B.tail fracPart))
+    else 0
+ in
+  (if neg then -1 else 1) * ((f decPart) + frac)
+  
 
 defaultCarState = CarState {
    z   = 0
   ,angle  = 0
-  ,gear  = 1
+  ,gear'  = 1
   ,trackPos = 0
   ,speedY = 0
   ,distRaced = 0
