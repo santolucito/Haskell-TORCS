@@ -43,7 +43,7 @@ all:  ${PDF}
 
 
 clean:
-	$(RM)  $(PACKAGE).cls *.log *.aux \
+	$(RM)  *.pdf *.log *.aux \
 	*.cfg *.glo *.idx *.toc \
 	*.ilg *.ind *.out *.lof \
 	*.lot *.bbl *.blg *.gls *.cut *.hd \
