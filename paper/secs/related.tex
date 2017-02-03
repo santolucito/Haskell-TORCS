@@ -1,6 +1,15 @@
 \section{Related Work}
 
+TORCS was used by ~\cite{kamali2016formal} as a simulator for formal verification of platoons.
+
+There has been demonstrated interest in using Haskell for safer autonomous vehicles ~\cite{pike2014}.
+They highlight the benefits of a type-safe, functional language to avoid programming errors.
+
+FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zuo16}.
+This work extends FRP to also prioritize certain functions for timing constraints.
+This has been not yet been tested on vehicle simulation, no doubt in part due to the lack of a simulator compatible with Haskell.
+
 To the best of our knowledge this is the first FRP-based vehicle simulator.
-Although there are many bindings to verious vehicle simulators, these tend to use imperative languages.
+Although there are many bindings to various vehicle simulators, these tend to use imperative languages.
 For instance, TORCS allows users to direct edit the package and add a new car in C++.
 There are also a few TORCS bindings for python, which have been notably used in the TORCS competition.
