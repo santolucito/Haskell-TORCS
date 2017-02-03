@@ -1,3 +1,35 @@
 \section{Introduction}
 
-We use FRP
+Autonomous vehicles are considered to be one of the most challenging
+types of reactive systems currently under development. They need to
+interact with a highly reactive environment. Life critical decisions
+have to be made instantaneously and need to be executed at the right
+point in time. However, even if the intricate task of designing such
+systems is conquered, it still needs to be ensured, that the result is
+also safe and reliable.
+
+
+
+\begin{itemize}
+
+\item explain the rise of functional programming languages, and that 
+types provide intuitive reasoning about safety
+
+\item explain that functional languages now also are used for hardware
+  (embedded systems people probably don't know about that) (mention
+  results like \emph{clash} or \emph{Kansas Lava})
+
+\item for reactive systems, a proper notion of time is necessary,
+  motivate on some example (synchronous vs asynchronous, real vs
+  discrete), finally lead to FRP
+
+\item motivate FRP (this is the most important part, almost sure that
+  nobody of the reviews will know about; go through the very basics,
+  remember these are embedded systems people)
+
+\item we provide first example of using FRP to control autonomous
+  vehicle, our approach is elegant and simple, which makes it
+  resistant against errors. Furthermore it is easily extendable
+  without breaking the remaining system.
+
+\end{itemize}
