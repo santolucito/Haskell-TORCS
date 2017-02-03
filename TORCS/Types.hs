@@ -75,11 +75,16 @@ fromByteString s = let
   fs = filter (/="") fs' :: [ByteString]
   ps = map (B.span (/=' ')) fs :: [(ByteString,ByteString)]
   fieldMap = M.fromList ps
-  a = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "angle" fieldMap 
-  spx = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "speedX" fieldMap 
-  trackPos = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" "trackPos" fieldMap 
+  getField s = readAsDouble $ B.filter (/=' ') $ M.findWithDefault "" s fieldMap
  in
-  traceMe defaultCarState {angle = a, speedX = spx, trackPos = trackPos}
+  traceMe defaultCarState 
+     {angle = getField "angle", 
+      speedX = getField "speedX", 
+      speedZ = getField "speedZ", 
+      rpm = getField "rpm", 
+      fuel = getField "fuel", 
+      trackPos = getField "trackPos",
+      damage = getField "damage"}
 
 traceMe x = traceShow x x 
 -- TODO some has to have a better way of doing this

@@ -1,33 +1,46 @@
 \section{Introduction}
 
-Autonomous vehicles are considered to be one of the most challenging
-types of reactive systems currently under development. They need to
-interact with a highly reactive environment. Life critical decisions
-have to be made instantaneously and need to be executed at the right
-point in time. However, even if the intricate task of designing such
-systems is conquered, that the result must be guaranteed to be also safe and reliable.
+%AVs must be safe
+Autonomous vehicles are considered to be one of the most challenging types of reactive systems currently under development. 
+They need to interact reliably with a highly reactive environment and crashes cannot be tolerated.
+Life critical decisions have to be made instantaneously and need to be executed at the right point in time. 
+However, even if the intricate task of designing such systems is conquered, that the result must be guaranteed to be also safe and reliable.
 
-Program verification is not only applied in reactive settings, but also useful for verifying other mission-critical applications.
+%static program analysis can help
+To ensure that such systems are indeed safe, there has been much work in static program analysis.
 One major advancement from the programming languages community towards bug-free software has been the development of functional languages.
-Functional languages use features to control the space of possible programs via abstraction, which can prevent many common programming errors.
-For example, functional purity reduces the possibility of malformed state that can cause unexpected behavior.
+Functional languages use language features to control the space of possible programs via abstraction, which can prevent many common programming errors.
+
+%a good 'static analysis' tool is to use a functional language
+One static analysis tool that has proved useful is a strong type system as featured in functional languages~\cite{cardelli1996type}.
+Another example is functional purity, which reduces the possibility of malformed state that can cause unexpected behavior.
 In the simplest case, the higher-order function \texttt{map} common to functional languages is an abstraction for looping (among other functions) that eliminates the typical intermediate counter.
 This helps to eliminate the possibility for runtime index out of bounds errors due to mistaken reasoning about edge cases.
 
+%as an example, look at hardware and low level code
+Because of these saftey benefits, functional languages are now also used for critical systems such as hardware.
+ClaSH was used to program an FPGA to solve N Queens in a purely functional language~\cite{clash2014}.
+FPGA program can be difficult because of the low level memory and instruction management, but functional languages can abstract some of these issues away from the user.
+Another example is Ivory, a functional language that compiles directly to C code that was used to build safer autonomous vehicles~\cite{pike2014}
+This language still provides access to the low level operations necessary for embedded system programming, but still enforces good programming practice, such as disallowing pointer arithmetic, with a rich type system.
+%TODO include ref to {Kansas Lava}
 
+%when applying FP to reactive systems we have trouble
+However, despite these advantages of functional programming, there are some difficulties when applying this approach to reactive systems.
+One difficulty with can be the insistence on purity, which separates data manipulation code from sources of unknown data, such as IO.
+Since reactive systems require a constant interaction between the environment and the agent, purity is sometimes seen as an obstacle.
 
-explain that functional languages now also are used for hardware
-  (embedded systems people probably don't know about that) (mention
-  results like \emph{clash} or \emph{Kansas Lava})
-
-
-for reactive systems, a proper notion of time is necessary,
+%but FRP can help us
+A solution to this problem is to use a paradigm called Functional Reactive Programming (FRP)~\cite{hudak2003arrows,hudak2000haskell}.
+FRP uses abstractions of computations available in functional languages (\eg monads, arrows, applicative) to allow for a separation between 
+In fact, as we will see, the ability to separate types of computations can be helpful in building reactive system that can be easily analyzed.
+wing the original definition by Agrawal et al.[2] the problem of association rule mining is defined as:
+Furthermore, reactive systems require a consistent notion of time.
+Functional Reactive Programming achieves this by creating an abstraction of time on the type level
   motivate on some example (synchronous vs asynchronous, real vs
   discrete), finally lead to FRP
 
-
-
-
+%we will explain FRP in depth in the sequel
 In summary, we make the following contributions:
 
 \begin{itemize}

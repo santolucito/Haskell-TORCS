@@ -21,7 +21,7 @@ myDriver = proc e -> do
     a <- arr gas -< (speedX,s)
     returnA -< defaultDriveState {accel = a, gear = g, steer = s}
 
-targetSpeed = 100
+targetSpeed = 150
 
 shifting :: Double -> Int
 shifting s = if 
@@ -34,15 +34,15 @@ shifting s = if
  
 steering :: (Double,Double) -> Double
 steering (spd,trackPos) = let
-  turns = spd*14 / pi
-  centering = turns - (trackPos*0.1)
+  turns = spd*17 / pi
+  centering = turns - ((trackPos)*0.3)
   clip x = max (-1) $ min x 1
  in
   clip centering
   
 gas :: (Double,Double) -> Double
 gas (speed,steer) = 
-  if speed < (targetSpeed-(steer*50)) then 0.5 else 0
+  if speed < (targetSpeed-(steer*180)) then 0.8 else 0
   
 getE :: Event CarState -> CarState
 getE  e = case e of
