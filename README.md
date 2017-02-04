@@ -11,6 +11,5 @@ on Ubunutu 16.04, you may need to comment out line 70 in src/modules/simu/simuv2
 
 TODO
 
-write controller for platoon
-
-build and ship to hackage
+- write controller for basic platoon
+- build and ship to hackage
