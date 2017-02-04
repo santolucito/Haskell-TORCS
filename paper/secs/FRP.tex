@@ -26,17 +26,18 @@ We omit an implementation, as the details of the data transformation are not rel
 
 There are many types of FRP based on different abstractions.
 The monad abstraction can be used to handle signal processing~\cite{van2014monadic},
- but we will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}.
+ but we will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}, so called Arrowized FRP.
 Arrow generally run faster with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
 This can be beneficial because the more restrictive our languages, the less likely it is for a programmer to make a mistake.
 As we will see in the sequel, Yampa is still powerful enough to write a controller to drive an autonomous vehicle.
 At the same time, the style is also syntactically clear accessible to make for an easy introduction to the FRP paradigm.
 
-In arrowized FRP, Haskell provides an special syntax called ArrowNotation.
+In Arrowized FRP, Haskell provides an special syntax.
 This is a composition environment, in which the programmer only manages the composition of arrow functions.
 Inputs are read in from the right hand side, and piped to the left hand side.
+This is demonstrated in Listing~\ref{lst:arrows}.
 
-\begin{lstlisting}
+\begin{lstlisting}[float,floatplacement=h!,caption=Basic Arrowized FRP syntax,label=lst:arrows]
 myDriver :: SF Image Steer
 myDriver = proc image -> do
   basicSteer    <-     turn  -< image
@@ -51,10 +52,10 @@ Since \texttt{turn} was already on the signal level, we did not need to apply th
 We can also imagine that our function to avoid obstacles requires two images to calculate the adjusted steering command.
 This might be to filter noise in the image, or to calculate the velocity of an approaching obstacle.
 In this case, we will need to save the previous state of the image for the next processing turn.
-This can be achieved by using a recursive arrow. 
-Eliding the technical details for the purposes of this presentation, the syntax looks as follows:
+This can be achieved by using an ArrowLoop instance with the \texttt{rec} keyword.
+Eliding the technical details for the purposes of this presentation, the syntax looks as shown in Listing~\ref{lst:loop}.
 
-\begin{lstlisting}
+\begin{lstlisting}[float,caption=Using ArrowLoop to send feedback,label=lst:loop]
 myDriver :: SF Image Steer
 myDriver = proc image -> do
   rec
@@ -69,6 +70,9 @@ This creates a type of feedback loop that is then used in the updated \texttt{av
 The \texttt{rec} keyword is used to denote a section of arrow code that has a mutual dependency.
 Without the keyword, there would be an unresolvable dependency loop in the code.
 
+
+
+
 \subsection{Case Study : Driving}
 A driver observes the environment and changes the drive state over time.
 This is represented as a \textit{signal function (SF)} in Yampa.
@@ -78,6 +82,7 @@ type Driver = SF CarState DriveState
 \end{lstlisting}
 
 We then can create a driver as shown in Listing~\ref{lst:driver}
+This is the entirety of the code needed for a basic controller that can successfully, and with some speed and finesse, navigate a vehicle in track shown in Fig.~\ref{fig:race}.
 
 One major advantage of FRP is separation of control flow and data level manipulation. 
 This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
@@ -86,7 +91,7 @@ The user then only needs to verify the \texttt{steering} function in isolation f
 This is a pure function, as evidenced by the type signature, which produces a new steering value based on the angle relative to the edges of the track and position on the track (where 0 is centered between the edges, and 1 is the left wall).
 
 %\begin{minipage}{\linewidth}
-\begin{lstlisting}[float,floatplacement=HR,caption=A complete basic controller in Yampa, label=lst:driver]
+\begin{lstlisting}[float,floatplacement=TR,caption=A complete basic controller in Yampa, label=lst:driver]
 myDriver :: Driver
 myDriver = proc CarState{..} -> do
   rec 
@@ -117,5 +122,3 @@ gas (speed,steer) =
 \end{lstlisting}
 %\end{minipage}
 
-The above is the entirety of the code needed for a basic controller that can successfully navigate a vehicle in track shown in Fig.~\ref{fig:race}.
-\cmark{TODO should I include the python controller that does the same thing but is more complicated code?}
