@@ -20,7 +20,7 @@ This helps to eliminate the possibility for runtime index out of bounds errors d
 %as an example, look at hardware and low level code
 Because of these saftey benefits, functional languages are now also used for critical systems such as hardware.
 ClaSH was used to program an FPGA to solve N Queens in a purely functional language~\cite{clash2014}.
-FPGA program can be difficult because of the low level memory and instruction management, but functional languages can abstract some of these issues away from the user.
+FPGA programs can be difficult because of the low level memory and instruction management, but functional languages can abstract some of these issues away from the user.
 Another example is Ivory, a functional language that compiles directly to C code that was used to build safer autonomous vehicles~\cite{pike2014}
 This language still provides access to the low level operations necessary for embedded system programming, but still enforces good programming practice, such as disallowing pointer arithmetic, with a rich type system.
 %TODO include ref to {Kansas Lava}

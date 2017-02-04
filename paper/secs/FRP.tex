@@ -25,9 +25,9 @@ This function will process video and use it to decide how to steer.
 We omit an implementation, as the details of the data transformation are not relevant to the structure of the FRP code.
 
 There are many types of FRP based on different abstractions.
-Many libraries use the monad abstraction to handle signal processing~\cite{monadFRP1,monadFRP2}.
-We will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}.
-Yampa is fundamentally less expressive than a monadic FRP.
+The monad abstraction can be used to handle signal processing~\cite{van2014monadic},
+ but we will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}.
+Arrow generally run faster with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
 This can be beneficial because the more restrictive our languages, the less likely it is for a programmer to make a mistake.
 As we will see in the sequel, Yampa is still powerful enough to write a controller to drive an autonomous vehicle.
 At the same time, the style is also syntactically clear accessible to make for an easy introduction to the FRP paradigm.
@@ -44,7 +44,7 @@ myDriver = proc image -> do
   returnA -< adjustedSteer
 \end{lstlisting}
 
-In this example, we introduce a new function \texttt{avoid :: (Image,Steer) -> Steer}, that will adjust our basic steering plan based on the image to avoid any obstacles.
+In this example, we introduce \texttt{avoid :: (Image,Steer) -> Steer}, a new function that will adjust our basic steering plan based on the image to avoid any obstacles.
 In the above example, this function is lifted to the signal level using \texttt{arr :: (a -> b) -> SF a b}.
 Since \texttt{turn} was already on the signal level, we did not need to apply the lifting function.
 
