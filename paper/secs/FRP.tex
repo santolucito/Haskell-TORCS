@@ -74,26 +74,39 @@ Without the keyword, there would be an unresolvable dependency loop in the code.
 
 
 \subsection{Case Study : Driving}
-A driver observes the environment and changes the drive state over time.
-This is represented as a \textit{signal function (SF)} in Yampa.
+
+As a demonstration of our library in use, we present a case study on a controller for a car on an empty race track.
+We implement a controller in FRP using Yampa, as shown in Listing~\ref{lst:driver}, that can be connected to TORCS using our library, \ourLib.
+This code is complete and can be run as-is with an installation of TORCS.
+This controller can successfully, and with some speed and finesse, navigate a vehicle in track shown in Fig.~\ref{fig:race}.
+
+In order to connect to the library, the top level function must have type \texttt{Driver}, a type synonym for a signal function that process sensor data and makes driving decisions.
 
 \begin{lstlisting}
 type Driver = SF CarState DriveState
 \end{lstlisting}
 
-We then can create a driver as shown in Listing~\ref{lst:driver}
-This is the entirety of the code needed for a basic controller that can successfully, and with some speed and finesse, navigate a vehicle in track shown in Fig.~\ref{fig:race}.
+Our controller uses ArrowLoop to keep track of the current gear of the car.
+Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
+Additioanlly, all of the data manipulation functions are pure, and lifted via \texttt{arr}.
+One major advantage of FRP this separation of dependency flow and data level manipulation. 
 
-One major advantage of FRP is separation of control flow and data level manipulation. 
 This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
-For example, the user may only be concerned with verifying that their steering control is correct.
-The user then only needs to verify the \texttt{steering} function in isolation from all other code.
-This is a pure function, as evidenced by the type signature, which produces a new steering value based on the angle relative to the edges of the track and position on the track (where 0 is centered between the edges, and 1 is the left wall).
+For example, if a programmer wants to verify that the steering control is correct, it is semantically guaranteed that the only function that must be checked is \texttt{steering}.
+Because of Haskell's purity, this is the only place where the steering value may be changed, significantly reducing the size of the verification problem.
 
-%\begin{minipage}{\linewidth}
 \begin{lstlisting}[float,floatplacement=TR,caption=A complete basic controller in Yampa, label=lst:driver]
+{-# LANGUAGE Arrows,
+             MultiWayIf,
+             RecordWildCards #-}
+module TORCS.Example where
+import TORCS.Connect
+import TORCS.Types
+
+main = startDriver myDriver
+
 myDriver :: Driver
-myDriver = proc CarState{..} -> do
+myDriver = proc CarState{..}  -> do
   rec 
     oldG <- iPre 0 -< g
     g <- arr shifting -< (rpm,oldG)
@@ -101,7 +114,7 @@ myDriver = proc CarState{..} -> do
     a <- arr gas -< (speedX,s)
   returnA -< defaultDriveState {accel = a, gear = g, steer = s}
 
-shifting :: Double -> Int
+shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
   | rpm > 6000 -> min 6 (g+1)
   | rpm < 2000 -> max 1 (g-1)

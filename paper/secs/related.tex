@@ -8,6 +8,10 @@ FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi201
 This work extends FRP to also prioritize certain functions for timing constraints.
 This has been not yet been tested on vehicle simulation, no doubt in part due to the lack of a simulator compatible with Haskell.
 
+FRP has been used for embedded systems~\cite{helbling2016juniper} and networking~\cite{voellmy2012scalable}.
+The FRP networking library took advantage of Haskell's multicore support and significantly outperformed competing tools written in C++ and Java.
+
+
 To the best of our knowledge this is the first FRP-based vehicle simulator.
 Although there are many bindings to various vehicle simulators, these tend to use imperative languages.
 For instance, TORCS allows users to direct edit the package and add a new car in C++.
