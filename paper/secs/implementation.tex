@@ -18,21 +18,8 @@ Although the existing tool is specifically tailored to be used with our controll
 It may also be interesting to build more lower level binding to allow non-FRP Haskell program to interface with TORCS.
 While FRP is one of the simplest interfaces for reactive systems programming in functional languages, it is also possible to use functional language in this context without FRP.
 
-\subsection{Multi-Vehicle Communication}
-
-Thanks to functional language's exceptional support for parallelism, controlling multiple vehicles in a multi-threaded environment is exceedingly simple. 
-In our library API, the user simply needs to use \texttt{startDrivers} rather than \texttt{startDriver}, and pass a list of \texttt{Driver} signal function that should drive together.
-This can be used to race various implementations against each other, or it can be used to build a vehicle platooning controller.
-In this case, the user will need to be able to simulate communication between the vehicles.
-
-Our library provides a simple interface for simulating communication between vehicles.
-In order to broadcast a message to the other vehicles in the simulation, the controller simply writes a message to the \texttt{broadcast} field of the output \texttt{DriveState}.
-That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
 
 The communication channels are simulated as a map from vehicle id to messages.
 Each vehicle is given write permission to their unique channel, that all others have read-only permissions.
 This ensures that no messages will be overwritten.
 We use Haskell's \texttt{MVar}, a threadsafe shared memory library to manage these channels between the threads of the different vehicles.
-
-We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
-If a user wishes to simulate unreliable communications, or distance constraints, this can be simulated on a case-by-case basis.

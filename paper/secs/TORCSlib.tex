@@ -1,0 +1,81 @@
+\section{\ourLib}
+
+\subsection{Basics}
+
+A introduction to the key types and strucutre of \ourLib.
+
+\subsection{Case Study : Driving}
+
+As a demonstration of the \ourLib library in use, we present a case study on a simple controller for a car on an empty race track.
+We implement a controller in FRP using Yampa, as shown in Listing~\ref{lst:driver}, that can be connected to TORCS using our library, \ourLib.
+This code is complete and can be run as-is with an installation of TORCS.
+This controller can successfully, and with some speed and finesse, navigate a vehicle in track shown in Fig.~\ref{fig:race}.
+
+In order to connect to the library, the top level function must have type \texttt{Driver}, a type synonym for a signal function that process sensor data and makes driving decisions.
+
+\begin{lstlisting}
+type Driver = SF CarState DriveState
+\end{lstlisting}
+
+Our controller uses ArrowLoop to keep track of the current gear of the car.
+Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
+Additioanlly, all of the data manipulation functions are pure, and lifted via \texttt{arr}.
+One major advantage of FRP this separation of dependency flow and data level manipulation. 
+
+This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
+For example, if a programmer wants to verify that the steering control is correct, it is semantically guaranteed that the only function that must be checked is \texttt{steering}.
+Because of Haskell's purity, this is the only place where the steering value may be changed, significantly reducing the size of the verification problem.
+
+\begin{lstlisting}[float,floatplacement=TR,caption=A complete basic controller in Yampa, label=lst:driver]
+{-# LANGUAGE Arrows,
+             MultiWayIf,
+             RecordWildCards #-}
+module TORCS.Example where
+import TORCS.Connect
+import TORCS.Types
+
+main = startDriver myDriver
+
+myDriver :: Driver
+myDriver = proc CarState{..}  -> do
+  rec 
+    oldG <- iPre 0 -< g
+    g <- arr shifting -< (rpm,oldG)
+    s <- arr steering -< (angle,trackPos)
+    a <- arr gas -< (speedX,s)
+  returnA -< defaultDriveState {accel = a, gear = g, steer = s}
+
+shifting :: (Double,Int) -> Int
+shifting (rpm,g) = if 
+  | rpm > 6000 -> min 6 (g+1)
+  | rpm < 2000 -> max 1 (g-1)
+  | otherwise  -> g
+ 
+steering :: (Double,Double) -> Double
+steering (spd,trackPos) = let
+  turns = spd*14 / pi
+  centering = turns - (trackPos*0.1)
+  clip x = max (-1) (min x 1)
+ in
+  clip centering
+
+targetSpeed = 100
+gas :: (Double,Double) -> Double
+gas (speed,steer) = 
+  if speed < (targetSpeed-(steer*50)) then 1 else 0
+\end{lstlisting}
+
+
+\subsection{Multi-Vehicle Communication}
+
+Thanks to functional language's exceptional support for parallelism, controlling multiple vehicles in a multi-threaded environment is exceedingly simple. 
+In our library API, the user simply needs to use \texttt{startDrivers} rather than \texttt{startDriver}, and pass a list of \texttt{Driver} signal function that should drive together.
+This can be used to race various implementations against each other, or it can be used to build a vehicle platooning controller.
+In this case, the user will need to be able to simulate communication between the vehicles.
+
+Our library provides a simple interface for simulating communication between vehicles.
+In order to broadcast a message to the other vehicles in the simulation, the controller simply writes a message to the \texttt{broadcast} field of the output \texttt{DriveState}.
+That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
+
+We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
+If a user wishes to simulate unreliable communications, or distance constraints, this can be simulated on a case-by-case basis.
