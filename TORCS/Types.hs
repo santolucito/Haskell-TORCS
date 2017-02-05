@@ -11,30 +11,22 @@ import Data.Maybe
 import FRP.Yampa
 
 import Debug.Trace
+traceMe x = traceShow x x 
 
 -- | A driver observes the environment and changes the drive state
 type Driver = SF (Event CarState) DriveState
 
 -- | The drive state dictates how we move around the world
 data DriveState = DriveState {
-   gear   :: Int
-  ,clutch :: Double
-  ,focus  :: [Int]
-  ,accel  :: Double
-  ,meta   :: Double
-  ,break :: Double
-  ,steer  :: Double
+   gear      :: Int
+  ,clutch    :: Double
+  ,focus     :: [Int]
+  ,accel     :: Double
+  ,meta      :: Double
+  ,break     :: Double
+  ,steer     :: Double
+  ,broadcast :: String
 } deriving (Show)
-
-toByteString :: DriveState -> ByteString
-toByteString DriveState{..} = B.pack $
-  "(gear " ++(show gear)++")"++
-  "(clutch "++(show clutch)++")"++
-  "(focus "++(show focus)++")"++
-  "(accel "++(show accel)++")"++
-  "(meta " ++(show meta)++")"++
-  "(break "++(show break)++")"++
-  "(steer "++(show steer)++")"
 
 defaultDriveState = DriveState {
   gear = 1
@@ -43,65 +35,33 @@ defaultDriveState = DriveState {
  ,accel = 1
  ,meta = 0
  ,break = 1
- ,steer = 0}
+ ,steer = 0
+ ,broadcast = ""}
 
 
 -- | car state is everything we can observe in the world
 data CarState = CarState {
-   z   :: Double
-  ,angle  :: Double
-  ,gear'  :: Int
-  ,trackPos  :: Double
-  ,speedY :: Double
-  ,distRaced :: Double
-  ,speedZ :: Double
-  ,damage :: Double
-  ,wheelSpinVel :: [Double] -- length 4
-  ,focus :: [Int]
-  ,track :: [Double]
-  ,curLapTime :: Double
-  ,speedX :: Double
-  ,racePos :: Int
-  ,fuel :: Double
-  ,distFromStart :: Double
-  ,opponents :: [Double] -- maybe distance from me?
-  ,rpm   :: Double
-  ,lastLapTime :: Double
+   z              :: Double
+  ,angle          :: Double
+  ,gear'          :: Int
+  ,trackPos       :: Double
+  ,speedY         :: Double
+  ,distRaced      :: Double
+  ,speedZ         :: Double
+  ,damage         :: Double
+  ,wheelSpinVel   :: [Double] -- length 4
+  ,focus          :: [Int]
+  ,track          :: [Double]
+  ,curLapTime     :: Double
+  ,speedX         :: Double
+  ,racePos        :: Int
+  ,fuel           :: Double
+  ,distFromStart  :: Double
+  ,opponents      :: [Double] -- maybe distance from me?
+  ,rpm            :: Double
+  ,lastLapTime    :: Double
+  ,communications :: M.Map Int (Maybe String)
 } deriving (Show)
-
-fromByteString :: ByteString -> CarState 
-fromByteString s = let
-  fs' = B.splitWith (\c -> c==')' || c=='(') s
-  fs = filter (/="") fs' :: [ByteString]
-  ps = map (B.span (/=' ')) fs :: [(ByteString,ByteString)]
-  fieldMap = M.fromList ps
-  getField' s =  B.filter (/=' ') $ M.findWithDefault "" s fieldMap
-  getField s = readAsDouble $ getField' s
- in
-  defaultCarState 
-     {angle = getField "angle", 
-      speedX = getField "speedX", 
-      speedZ = getField "speedZ", 
-      rpm = getField "rpm", 
-      gear' =  traceShow ps $ fromMaybe 0 $ fmap fst$ B.readInt "gear", 
-      fuel = getField "fuel", 
-      trackPos = getField "trackPos",
-      damage = getField "damage"}
-
-traceMe x = traceShow x x 
--- TODO some has to have a better way of doing this
-readAsDouble :: ByteString -> Double
-readAsDouble s = let
-  neg = B.head s == '-'
-  s' = if neg then B.tail s else s
-  (decPart, fracPart) = B.span (/='.') s'
-  f = fromIntegral. fromMaybe 0. fmap fst. B.readInt
-  frac = if B.length fracPart > 0 
-    then (f $ B.tail fracPart) / (fromIntegral $ 10^(B.length $ B.tail fracPart))
-    else 0
- in
-  (if neg then -1 else 1) * ((f decPart) + frac)
-  
 
 defaultCarState = CarState {
    z   = 0
@@ -123,4 +83,5 @@ defaultCarState = CarState {
   ,opponents = [0]
   ,rpm   = 0
   ,lastLapTime = 0
+  ,communications = M.empty
 }

@@ -1,66 +1,97 @@
 {-# LANGUAGE OverloadedStrings #-}
-module TORCS.Connect (startDriver) where
+module TORCS.Connect (startDriver,startDrivers) where
 
 import Network.Socket hiding (sendTo,recvFrom)
 import Network.Socket.ByteString (sendTo,recvFrom)
 import Control.Exception
 
+import qualified Control.Monad.Parallel as P
+import Control.Concurrent
+import Control.Concurrent.MVar
+
+import Prelude hiding (concat)
 import Data.IORef
+import qualified Data.Map as M
 import Data.Time.Clock
-import Data.ByteString (ByteString)
+import Data.ByteString (ByteString,concat)
 import Data.ByteString.Char8 (pack)
+import Data.Tuple
+import Data.Maybe
 
 import FRP.Yampa 
 
 import TORCS.Types
+import TORCS.Parser
 
-port = "3001" :: ServiceName
- 
-{-
---| We want to be able to simulate platooning
 
-startDrivers  :: [(Socket -> IO())] -> IO()
-startDrivers ds = 
-  map (forkIO. startDriver) ds
--}
+-- | We want to be able to simulate platooning
+startDrivers  :: [Driver] -> IO()
+startDrivers ds = do
+  mvars' <- mapM (\x->newEmptyMVar) ds :: IO [MVar String]
+  let 
+    mvars = M.fromList $ map swap $ zip mvars' [3001..] :: M.Map Int (MVar String)
+    ps = map show [3001..]
+    ts = map (*1000000) [0,1..]
+    cs = zip (zip ds ts) ps
+  P.mapM ((uncurry. uncurry) (startDriverWithPort mvars)) cs 
+  return ()
 
-startDriver :: Driver -> IO ()
-startDriver myDriver = withSocketsDo $ bracket connectMe close (yampaRunner myDriver)
+-- if starting a single driver, we dont need any communication channels (mvar)
+startDriver d = startDriverWithPort M.empty d 0 "3001"
+
+startDriverWithPort :: M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO ()
+startDriverWithPort mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
           where
             connectMe = do
+              threadDelay delay
               (serveraddr:_) <- getAddrInfo
                                   (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
                                   Nothing (Just port)
               sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
               connect sock (addrAddress serveraddr)
-              _ <- sendTo sock "SCR(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)" (addrAddress serveraddr)
+              let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
+              _ <- sendTo sock mysteryString (addrAddress serveraddr)
               return sock
 
---TODO make all this socket stuff into a Monad 
---and expose lower level api to allow for use with non-Yampa libraries
-yampaRunner :: Driver -> Socket -> IO ()
-yampaRunner myDriver conn = do
-  (msg,d) <- recvFrom conn 1024
+--the id (port number) is used to choose this car's writing mvar
+yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO ()
+yampaRunner myDriver allChannels id conn = do
+  (msg,addr) <- recvFrom conn 1024
   t <- getCurrentTime
   timeRef <- newIORef t
+  let myChannel = read id :: Int
   reactimate
     (return NoEvent)
-    (sense timeRef conn)
-    (action conn d)
+    (sense timeRef conn allChannels)
+    (action conn addr (M.lookup myChannel allChannels))
     myDriver
 
-action :: Socket -> SockAddr -> Bool -> DriveState -> IO Bool
-action conn d _ s = do
-  _ <- sendTo conn (toByteString s) d
+-- action will do two things separately
+-- first, send the drive instructions
+-- second, broadcast the message to the other threads
+action :: Socket -> SockAddr -> Maybe (MVar String) -> Bool -> DriveState -> IO Bool
+action conn d myBroadcastChan _ msg = do
+  _ <- sendTo conn (toByteString msg) d 
+  oldVal <- maybe (return Nothing) tryReadMVar  myBroadcastChan
+  _ <- maybe (return False) (\x -> if oldVal == (Just $ broadcast msg) then return False else mySwapMVar x (broadcast msg)) myBroadcastChan
   return False
 
-sense :: IORef UTCTime -> Socket -> Bool -> IO (DTime, Maybe (Event CarState))
-sense timeRef conn _ = do
+mySwapMVar :: MVar a -> a -> IO Bool
+mySwapMVar m v = do
+  tryTakeMVar m
+  tryPutMVar m v
+  
+-- sensing will try to read from all the mvars, and add this info to CarState
+-- this will not write anything
+sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> Bool -> IO (DTime, Maybe (Event CarState))
+sense timeRef conn chans _ = do
   cur <- getCurrentTime
   (msg,d) <- recvFrom conn 1024
+  ms <- mapM tryReadMVar chans :: IO (M.Map Int (Maybe String))
   dt <- timediff timeRef cur
+  let x = (fromByteString msg){communications = ms}
   --print dt
-  return (dt, Just $ return $ fromByteString msg)
+  return (dt, Just $ return x) --TODO do i need the Event wrapper?
 
 timediff ::  IORef UTCTime -> UTCTime -> IO DTime
 timediff ref cur = do
