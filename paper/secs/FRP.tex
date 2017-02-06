@@ -7,11 +7,9 @@ However, tracing the result's timed behavior gets unmanageable complex as well.
 Functional Reactive Programming instead introduces a concrete abstraction of time that allows the programmer to safely manipulate time-varying values.
 The key abstraction is given by a \textit{signal}, providing the programmer with simple type interface:
 
-\vspace{0.2em}
 \begin{lstlisting}
   type Signal a = Time -> a
 \end{lstlisting}
-\vspace{0.2em}
 
 \noindent Intuitively, a signal is just a function that relates time to some value.
 For example, the type \texttt{Signal Image} then represents a video, while \texttt{Signal Steer} captures a steering wheel operated over time.
@@ -29,14 +27,17 @@ At the same time, our syntax is clear and accessible enough to make for an easy 
 Along with signals, Yampa also introduces the abstraction of a \textit{signal function (SF)}.
 This is a transformer from one signal to another.
 
-\vspace{0.2em}
 \begin{lstlisting}
-  type SF a b = Signal a  -> Signal b
+  type SF a b = Signal a -> Signal b
 \end{lstlisting}
-\vspace{0.2em}
 
-\noindent Using the previous signals, imagine a type for a steering function, which operates based on a video stream as \texttt{turn ::} \texttt{SF Image Steer}.
-The function processes video and uses it to decide how to steer.
+\noindent Using the previous signals, imagine a type for a steering function, which operates based on a video stream as
+
+\begin{lstlisting}
+  turn :: SF Image Steer
+\end{lstlisting}
+
+\noindent The function processes video and uses it to decide how to steer.
 We omit an implementation, as the details of the data transformation are not relevant to the structure of the FRP code.
 
 Haskell provides special syntax for Arrowized FRP, which mimics the structure of control flow charts.
@@ -48,22 +49,22 @@ A demonstration is given in Listing~\ref{lst:arrows}.
 myDriver :: SF Image Steer
 myDriver = proc image -> do
   basicSteer    <-     turn  -< image
-  adjustedSteer <- arr avoid -< (image,basicSteer)
+  adjustedSteer <- arr avoid -< (image, basicSteer)
   returnA -< adjustedSteer
 \end{lstlisting}
 
 The example introduces 
 %
-\begin{equation*}
-  \texttt{avoid ::} \ \texttt{(Image, Steer) -> Steer},
-\end{equation*}
+\begin{lstlisting}
+  avoid :: (Image, Steer) -> Steer
+\end{lstlisting}
 %
 a pure function that adjusts the basic steering plan based on the image to avoid any obstacles.
-In the above example, the function is lifted to the signal level using
+In the above example, the function is lifted to the signal level using:
 %
-\begin{equation*}
-   \texttt{arr ::} \ \texttt{(a -> b) -> SF a b}.
-\end{equation*}
+\begin{lstlisting}
+  arr :: (a -> b) -> SF a b
+\end{lstlisting}
 %
 The function \texttt{turn} already is on the signal level. Hence, we do not need to lift it.
 
@@ -82,8 +83,8 @@ myDriver :: SF Image Steer
 myDriver = proc image -> do
   rec
     oldI          <- iPre null -< image
-    basicSteer    <-     turn  -< image
-    adjustedSteer <- arr avoid -< (image,oldI,basicSteer)
+    basicSteer    <-      turn -< image
+    adjustedSteer <- arr avoid -< (image, oldI, basicSteer)
   returnA -< adjustedSteer
 \end{lstlisting}
 
