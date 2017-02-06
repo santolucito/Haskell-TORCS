@@ -2,7 +2,16 @@
 
 \subsection{Basics}
 
-A introduction to the key types and strucutre of \ourLib.
+We have developed a library for programming controllers for autonomous vehicles using FRP, and connecting those controllers to the TORCS vehicle simulator.
+This library, \ourLib, uses Yampa as the core FRP library, though the structure can easily be adapted to any Haskell FRP library.
+
+The core functionality of \ourLib is captured in the function \texttt{startDriver :: Driver -> IO()}.
+This function will automatically connect a controller, expressed with the \texttt{Driver} type, to TORCS, which results in continuous \texttt{IO()} actions.
+The user must implement a controller that will process all the data available from the sensors \texttt{CarState}, and output a commands to the vehicle, as a \texttt{DriveState}.
+
+\begin{lstlisting}
+type Driver = SF CarState DriveState
+\end{lstlisting}
 
 \subsection{Case Study : Driving}
 
@@ -11,16 +20,11 @@ We implement a controller in FRP using Yampa, as shown in Listing~\ref{lst:drive
 This code is complete and can be run as-is with an installation of TORCS.
 This controller can successfully, and with some speed and finesse, navigate a vehicle in track shown in Fig.~\ref{fig:race}.
 
-In order to connect to the library, the top level function must have type \texttt{Driver}, a type synonym for a signal function that process sensor data and makes driving decisions.
-
-\begin{lstlisting}
-type Driver = SF CarState DriveState
-\end{lstlisting}
-
 Our controller uses ArrowLoop to keep track of the current gear of the car.
 Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
-Additioanlly, all of the data manipulation functions are pure, and lifted via \texttt{arr}.
-One major advantage of FRP this separation of dependency flow and data level manipulation. 
+In general, the ArrowLoop can be used to maintain any state that may be of interest in a future processing step.
+Additionally, notice all of the data manipulation functions are pure, and lifted via \texttt{arr}.
+One major advantage of FRP is this separation of dependency flow and data level manipulation. 
 
 This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
 For example, if a programmer wants to verify that the steering control is correct, it is semantically guaranteed that the only function that must be checked is \texttt{steering}.
