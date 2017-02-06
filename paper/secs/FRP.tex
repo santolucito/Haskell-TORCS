@@ -1,18 +1,19 @@
 \section{Functional Reactive Programming}
 
-The most common approach to construct reactive systems is the use of a call-back framework, which is embedded into a loop.
-The call-backs are used to query the state of variables, or to change them.
+The most common solution for the construction of reactive systems are call-back frameworks, embedded into a loop.
+The call-backs either are used to query the state of variables, or to change them.
 The approach is well suited for rapid prototyping. 
-However, tracing the result's timed behavior gets unmanageable complex as well.
+However, tracing the result's behavior over time gets unmanageable complex rapidly.
 Functional Reactive Programming instead introduces a concrete abstraction of time that allows the programmer to safely manipulate time-varying values.
+
 The key abstraction is given by a \textit{signal}, providing the programmer with simple type interface:
 
 \begin{lstlisting}
   type Signal a = Time -> a
 \end{lstlisting}
 
-\noindent Intuitively, a signal is just a function that relates time to some value.
-For example, the type \texttt{Signal Image} then represents a video, while \texttt{Signal Steer} captures a steering wheel operated over time.
+\noindent Intuitively, a signal is just a function that relates time to a value.
+For example, the type \texttt{Signal Image} represents a video, while \texttt{Signal Steer} captures a steering wheel operated over time.
 
 \subsection{Arrowized FRP}
 

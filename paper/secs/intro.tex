@@ -56,27 +56,27 @@ This language still provides access to the low level operations necessary for em
 
 %when applying FP to reactive systems purity is hard
 However, despite these advantages of functional programming, there are some difficulties when applying this approach to reactive systems.
-One difficulty with can be the insistence on purity, which separates data manipulation code from sources of unknown data, such as IO.
+One difficulty is the insistence on purity, which separates data manipulation code from sources of unknown data, such as IO.
 Since reactive systems require a constant interaction between the environment and the agent, purity is sometimes seen as an obstacle.
 
 %also there are many types of time
 Furthermore, reactive systems require a consistent notion of time, communication, and actions.
 For example, it is sometimes necessary to control a vehicle as an isolated agent, but it is also desirable to platoon a group a vehicles.
-This requires opening communication channels between vehicles, introducing the rate of sensing and a rate of communication.
-There may also be a need to have both continuous and discrete time behaviors.
-In a car, the steering wheel should act as a continuous signal, but a human-in-the-loop system~\cite{li2014synthesis} should additionally respond to discrete user actions, such as turning on a directional.
-Functional Reactive Programming achieves this by creating an abstraction of time on the type level that allows for both continuous and discrete behaviors.
+This requires opening communication channels between vehicles, introducing the sensing and communication rates.
+Furthermore, today's systems also need both: continuous and discrete time behaviors.
+In a car, the steering wheel should act as a continuous signal, but a human-in-the-loop system~\cite{li2014synthesis} it should additionally respond to discrete user actions, such as turning on a directional.
+Functional Reactive Programming resolves this mismatch by creating an abstraction of time on the type level that allows for both continuous and discrete behaviors.
 %TODO  motivate on some example (synchronous vs asynchronous, real vs discrete),
 
 %but FRP can help us
 A solution to this problem is to use a paradigm called Functional Reactive Programming (FRP)~\cite{hudak2003arrows,hudak2000haskell}.
 FRP uses abstractions of computations available in functional languages (\eg monads, arrows, applicatives) to allow for a separation between environment handling and computation.
 This separation makes functional languages powerful in a number of different reactive settings.
-In fact, the ability to separate types of computations can also be helpful in building reactive system that are easily analyzed.
+In fact, the ability to separate types of computations can also be helpful in building reactive system that are easily to analyze.
 
 %What did we do?
 We have built a library, \ourLib, to use FRP to control a vehicle inside a simulation.
-In the sequel, we will demonstrate the flexibility of this library.
+We demonstrate the flexibility of our library in the sequel.
 In addition to single vehicle control, \ourLib allows for easy simulation on open communication channels between vehicles.
 This is a critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{?}.
 As we will show, using \ourLib provides a simple interface for simulating this communication, which can ease the development task for testing novel algorithms in this domain.
