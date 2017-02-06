@@ -6,7 +6,7 @@ It has been used in the Simulated Car Racing Championship competition~\cite{SCRC
 In these competitions, a car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
 
 While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell. 
-As backend, we use the FRP library Yampa~\cite{yampa}. 
+As backend, we use the FRP library Yampa~\cite{courtney2003yampa}. 
 However, due to the unique programming style provided by Haskell and its purity, every other FRP library is suited as well, with respect to purely syntactic adaptions.
 With the assistance of FRP, we create the  vehicle controller in a principled way that allows users to manipulated sensor data in a transparent and well structured environment.
 

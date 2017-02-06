@@ -1,14 +1,13 @@
 \section{Related Work}
 
-TORCS has been used as a simulator for formal verification of platoons~\cite{kamali2016formal}, etc... \cmark{TODO pick a few TORCS paper from google scholar}.
+TORCS has been proven to provide an expressive framework for the research community~\cite{OnievaPAMP09,conf/cig/CardamoneLL09,conf/cig/MunozGS10}. 
+For instance, it has been used for formal verification of platoons~\cite{kamali2016formal}. 
 None of these works have used FRP as the language for the controller.
 
 
-FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zou2016}.
-This work extends FRP to also prioritize certain functions for timing constraints.
-This has been not yet been tested on vehicle simulation, in part due to the lack of a simulator compatible with the FRP language model.
+FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zou2016}, where FRP was extended to prioritize functions for timing constraints. However, due to the lack of a compatible simulator, the vehicle simulation never was implemented. 
 
-FRP has been used for embedded systems~\cite{helbling2016juniper} and networking~\cite{voellmy2012scalable}.
+FRP has also been used for embedded systems~\cite{helbling2016juniper} and networking~\cite{voellmy2012scalable}.
 The FRP networking library took advantage of Haskell's multicore support and significantly outperformed competing tools written in C++ and Java.
 
 
@@ -19,6 +18,7 @@ There are also TORCS bindings for python, java, and matlab, which have been used
 
 The videogame GTA~\cite{} has also been used to train image recognition software for autonomous vehicles~\cite{}.
 While GTA is professionally produced game, which has more attractive graphics and a more advanced physics engine, it has a different set of issues.
-First, is that as proprietary software that was not designed for autonomous vehcile reserach, the ability to build sensor based controllers is more restricted. 
-Furthermore, unlike TORCS, which is designed primarily as a vehicle simulator, GTA's physics engine is tuned to maximize entertainment.
-Using GTA as a meaningful control simulator would still be valuable work, but we leave this to future explorations.
+First, it is proprietary software not designed for autonomous vehicle research. 
+Hence, the ability to build sensor based controllers is more restricted. 
+Second, unlike TORCS, which is designed primarily as a vehicle simulator, GTA's physics engine is tuned to maximize entertainment.
+Using GTA as a meaningful control simulator would still be valuable work, but we leave this to the future.
