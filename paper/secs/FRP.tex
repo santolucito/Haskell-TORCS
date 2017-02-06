@@ -11,26 +11,29 @@ type Signal a = Time -> a
 
 A signal is then a function that relates time to some value.
 For example, the type \texttt{Signal Image} would then be video data, and \texttt{Signal Steer} would be the way a steering wheel is operated over time.
-With signals, FRP also introduces the abstraction of a \textit{signal function (SF)}.
+
+\subsection{Arrowized FRP}
+
+There are many types of FRP based on different abstractions from type theory.
+The monad abstraction can be used to handle signal processing~\cite{van2014monadic},
+  but we will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}, so called Arrowized FRP.
+Arrows generally run faster with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
+This can be beneficial because the more restrictive our language, the harder it is for a programmer to make a mistake.
+As we will see in the sequel, Yampa is still powerful enough to write complex controllers to drive an autonomous vehicle, that even communicate with other vehicles.
+At the same time, the style is also syntactically clear and accessible enough to make for an easy introduction to the FRP paradigm.
+
+Along with signals, Yampa also introduces the abstraction of a \textit{signal function (SF)}.
 This is a transformer from one signal to another.
 
 \begin{lstlisting}
-type SF a b = Signal a -> Signal b
+type SF a b = Signal a  -> Signal b
 \end{lstlisting}
 
-Using the previous signals, we can then introduce a type for a steering function that operates based on a video stream as \texttt{turn :: SF Image Steer}.
+Using the previous signals, we imagine a type for a steering function that operates based on a video stream as \texttt{turn :: SF Image Steer}.
 This function will process video and use it to decide how to steer.
 We omit an implementation, as the details of the data transformation are not relevant to the structure of the FRP code.
 
-There are many types of FRP based on different abstractions.
-The monad abstraction can be used to handle signal processing~\cite{van2014monadic},
- but we will instead choose to focus on a FRP library, Yampa, that uses the arrow abstraction~\cite{hudak2003arrows}, so called Arrowized FRP.
-Arrow generally run faster with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
-This can be beneficial because the more restrictive our languages, the less likely it is for a programmer to make a mistake.
-As we will see in the sequel, Yampa is still powerful enough to write a controller to drive an autonomous vehicle.
-At the same time, the style is also syntactically clear accessible to make for an easy introduction to the FRP paradigm.
-
-In Arrowized FRP, Haskell provides an special syntax.
+Haskell provides an special syntax for Arrowized FRP that mimics the more familiar monadic do notation.
 This is a composition environment, in which the programmer only manages the composition of arrow functions.
 Inputs are read in from the right hand side, and piped to the left hand side.
 This is demonstrated in Listing~\ref{lst:arrows}.
@@ -47,11 +50,13 @@ In this example, we introduce \texttt{avoid :: (Image,Steer) -> Steer}, a new fu
 In the above example, this function is lifted to the signal level using \texttt{arr :: (a -> b) -> SF a b}.
 Since \texttt{turn} was already on the signal level, we did not need to apply the lifting function.
 
-We can also imagine that our function to avoid obstacles requires two images to calculate the adjusted steering command.
+\subsection{Stateful FRP}
+
+Imagining that our function to avoid obstacles requires two images to calculate the adjusted steering command, we then require a mechanism for maintaining state between each processing step.
 This might be to filter noise in the image, or to calculate the velocity of an approaching obstacle.
-In this case, we will need to save the previous state of the image for the next processing turn.
-This can be achieved by using an ArrowLoop instance with the \texttt{rec} keyword.
-Eliding the technical details for the purposes of this presentation, the syntax looks as shown in Listing~\ref{lst:loop}.
+To do this we will use an abstraction called ArrowLoop to  save the previous state of the image for the next processing step.
+The \texttt{rec} keyword allows a syntactic sugar for using this ArrowLoop instance.
+Eliding the technical details for the purposes of this presentation and referring the interested reader to~\cite{paterson2001icfp}, the syntax looks as shown in Listing~\ref{lst:loop}.
 
 \begin{lstlisting}[float,caption=Using ArrowLoop to send feedback,label=lst:loop]
 myDriver :: SF Image Steer

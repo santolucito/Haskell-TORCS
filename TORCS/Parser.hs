@@ -9,6 +9,7 @@ import Data.Maybe
 
 import TORCS.Types
 
+import Debug.Trace
 -- | the parser reads a s-expressions to a CarState
 --   and writes a DriveState to a s-expression
 --   TORCS sends all data as doubles, or lists of doubles, none nested
@@ -37,11 +38,11 @@ fromByteString s = let
   getField s = readAsDouble $ getField' s
  in
   defaultCarState 
-     {angle = getField "angle", 
+     {angle = trace (B.unpack $ M.findWithDefault "" "track" fieldMap) getField "angle", 
       speedX = getField "speedX", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
-      gear' = floor $ getField "gear", 
+      gear' = floor $ getField "gear",
       fuel = getField "fuel", 
       trackPos = getField "trackPos",
       damage = getField "damage"}

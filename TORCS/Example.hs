@@ -19,19 +19,18 @@ myDriver :: Driver
 myDriver = proc e -> do
     CarState{..} <- arr getE -< e
     rec
-       oldG <- iPre 0 -< (traceShow communications g)
-       g <- arr shifting -< (rpm,oldG)
+       g <- arr shifting -< (rpm,gear')
        s <- arr steering -< (angle,trackPos)
        a <- arr gas -< (speedX,s)
        msg <- arr (\g->if g>4 then "im fast" else "im starting") -< g
     returnA -< defaultDriveState {accel = a, gear = g, steer = s, broadcast = msg}
 
-targetSpeed = 150
+targetSpeed = 210
 
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
-  | rpm > 6000 -> min 6 (g+1)
-  | rpm < 2500 -> max 1 (g-1)
+  | rpm > 5500 -> min 6 (g+1)
+  | rpm < 3000 -> max 1 (g-1)
   | otherwise  -> g
  
 steering :: (Double,Double) -> Double
@@ -44,7 +43,7 @@ steering (angle,trackPos) = let
   
 gas :: (Double,Double) -> Double
 gas (speed,steer) = 
-  if speed < (targetSpeed-((abs steer)*800)) then 0.8 else 0
+  if speed < (targetSpeed-((abs steer)*1800)) then 0.8 else 0
   
 getE :: Event CarState -> CarState
 getE  e = case e of

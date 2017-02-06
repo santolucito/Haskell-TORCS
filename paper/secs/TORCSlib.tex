@@ -1,17 +1,25 @@
 \section{\ourLib}
 
-\subsection{Basics}
 
 We have developed a library for programming controllers for autonomous vehicles using FRP, and connecting those controllers to the TORCS vehicle simulator.
 This library, \ourLib, uses Yampa as the core FRP library, though the structure can easily be adapted to any Haskell FRP library.
 
-The core functionality of \ourLib is captured in the function \texttt{startDriver :: Driver -> IO()}.
-This function will automatically connect a controller, expressed with the \texttt{Driver} type, to TORCS, which results in continuous \texttt{IO()} actions.
-The user must implement a controller that will process all the data available from the sensors \texttt{CarState}, and output a commands to the vehicle, as a \texttt{DriveState}.
+\subsection{Basics}
+
+To interface with \ourLib, a user must implement a controller that will process all the data available from the sensors \texttt{CarState}, and output a commands to the vehicle, as a \texttt{DriveState}.
+This is then exactly succinctly described as the now familiar \textit{signal function} from FRP.
+The core functionality of \ourLib is captured in the function \texttt{startDriver}, which will launch a controller in the simulator.
+This \texttt{startDriver} function will automatically connect a \texttt{Driver} to TORCS, which results in continuous \texttt{IO()} actions.
 
 \begin{lstlisting}
 type Driver = SF CarState DriveState
+startDriver :: Driver -> IO()
 \end{lstlisting}
+
+The sensor and output data structures contain all the typical data available in an autonomously controlled vehicle.
+\texttt{CarState} includes fields like \texttt{rpm} to monitor the engine, and \texttt{track} which simulates an array of LiDAR sensors oriented to the front of the vehicle.
+\texttt{DriveState} includes like \texttt{accel} to control gas pedal, and \texttt{steering} to control the angle of the steering wheel.
+A full description of the available data is available in the Simulated Car Racing Competition Manual~\cite{SCRCManual}. 
 
 \subsection{Case Study : Driving}
 
@@ -31,9 +39,7 @@ For example, if a programmer wants to verify that the steering control is correc
 Because of Haskell's purity, this is the only place where the steering value may be changed, significantly reducing the size of the verification problem.
 
 \begin{lstlisting}[float,floatplacement=TR,caption=A complete basic controller in Yampa, label=lst:driver]
-{-# LANGUAGE Arrows,
-             MultiWayIf,
-             RecordWildCards #-}
+{-# LANGUAGE Arrows, MultiWayIf, RecordWildCards #-}
 module TORCS.Example where
 import TORCS.Connect
 import TORCS.Types

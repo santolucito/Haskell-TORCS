@@ -17,6 +17,7 @@ traceMe x = traceShow x x
 type Driver = SF (Event CarState) DriveState
 
 -- | The drive state dictates how we move around the world
+--   see the TORCS manual for full description (https://arxiv.org/pdf/1304.1672)
 data DriveState = DriveState {
    gear      :: Int
   ,clutch    :: Double
@@ -40,6 +41,7 @@ defaultDriveState = DriveState {
 
 
 -- | car state is everything we can observe in the world
+--   see the TORCS manual for full description (https://arxiv.org/pdf/1304.1672)
 data CarState = CarState {
    z              :: Double
   ,angle          :: Double
@@ -57,11 +59,13 @@ data CarState = CarState {
   ,racePos        :: Int
   ,fuel           :: Double
   ,distFromStart  :: Double
-  ,opponents      :: [Double] -- maybe distance from me?
+  ,opponents      :: [Double] 
   ,rpm            :: Double
   ,lastLapTime    :: Double
-  ,communications :: M.Map Int (Maybe String)
+  ,communications :: Communications
 } deriving (Show)
+
+type Communications = M.Map Int (Maybe String)
 
 defaultCarState = CarState {
    z   = 0
