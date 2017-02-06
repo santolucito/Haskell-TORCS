@@ -7,8 +7,16 @@ They need to interact reliably with a highly reactive environment and crashes ca
 Life critical decisions have to be made instantaneously and need to be executed at the right point in time. 
 However, even if the intricate task of designing such systems is conquered, that the result must be guaranteed to be also safe and reliable.
 
+\cruzica{Here we have to actually describe what is this paper is about. 
+Can someone more knowledgeable check and rewrite my suggestion : In this 
+paper we present a first for system for controlling a vehicle inside of a simulation
+implemented using a functional reactive programming (FRP) library.   }
+
+
+
+
 %static program analysis can help
-To ensure that such systems are indeed safe, there has been much work in static program analysis.
+To ensure that such systems are indeed safe, there has been much work in static program analysis .
 One major advancement from the programming languages community towards bug-free software has been the development of functional languages.
 Functional languages use language features to control the space of possible programs via abstraction, which can prevent many common programming errors.
 
@@ -19,7 +27,7 @@ In the simplest case, the higher-order function \texttt{map} common to functiona
 This helps to eliminate the possibility for runtime index out of bounds errors due to mistaken reasoning about edge cases.
 
 %as an example, look at hardware and low level code
-Because of these saftey benefits, functional languages are now also used for critical systems such as hardware.
+Because of these safety benefits, functional languages are now also used for critical systems such as hardware.
 ClaSH was used to program an FPGA to solve N Queens in a purely functional language~\cite{clash2014}.
 FPGA programs can be difficult because of the low level memory and instruction management, but functional languages can abstract some of these issues away from the user.
 Another example is Ivory, a functional language that compiles directly to C code that was used to build safer autonomous vehicles~\cite{pike2014}
