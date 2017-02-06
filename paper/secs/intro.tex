@@ -1,99 +1,74 @@
 \section{Introduction}
 
-%AVs must be safe
-Autonomous vehicles are considered to be one of the most challenging types of reactive systems currently under 
-development~\cite{AlurMT16, WongpiromsarnKF11, RamanDSMS15}. 
-They need to interact reliably with a highly reactive environment and crashes cannot be tolerated.
-Life critical decisions have to be made instantaneously and need to be executed at the right point in time. 
-%However, even if the intricate task of designing such systems is conquered, that the result must be guaranteed to be also safe and reliable.
-%
-The critical nature of such systems calls for
-a development approach that is based on a formal system model with an unambiguos semantics.
-It has long been argued that a functional characterization of the stream-processing behavior of a reactive system provides a particularly clean and compositional description of the interaction between the components and between a system and its environment~\cite{DBLP:series/mcs/BroyS01,DBLP:conf/csdm/Broy12}. In this paper, we explore the realization of this idea in the setting of functional reactive programming.
+Autonomous vehicles are considered to be one of the most challenging
+types of reactive systems currently under development~\cite{AlurMT16,
+  WongpiromsarnKF11, RamanDSMS15}. They need to interact reliably with
+a highly reactive environment and crashes cannot be tolerated.  Life
+critical decisions have to be made instantaneously and need to be
+executed at the right point in time.
 
-\cruzica{Here we have to actually describe what is this paper is about. 
-Can someone more knowledgeable check and rewrite my suggestion : In this 
-paper we present a first for system for controlling a vehicle inside of a simulation
-implemented using a functional reactive programming (FRP) library. now describe which simulation is that.  It has to contain references where is the simulation coming from and why is it important.
+The development of autonomous vehicles and other cyberphysical systems
+is supported by a wide spectrum of
+programming and modelling methodologies, 
+including synchronous programming languages like Lustre and Esterelle,
+hardware-oriented versions of imperative programming languages like
+SystemC, and visual languages like MSCs and Stateflow-charts.
+The question which programming paradigm is best-suited to write
+easy-to-understand, bug-free code is still largely unresolved.
 
-Functional languages are important for their features such as... and they are used in applications where ... is super important. Now we mention Yaron Minsky and OCaml and financial world (cite http://dl.acm.org/citation.cfm?doid=1328438.1328441) 
+In the development of other forms of critical software, outside the
+embedded domain, developers increasingly turn to functional
+programming (cf.~\cite{financialsoftware}).  The strong type system in functional
+languages~\cite{cardelli1996type} largely eliminates runtime errors.
+Higher-order functions like \texttt{map} often eliminate the need for
+explicit index counters, and, hence, the risk of ``index out of
+bounds'' errors.  Functional purity reduces the possibility of
+malformed state that can cause unexpected behavior.
 
-Then I would mention the Ivory example (or in the swapped order) 
+While mathematical models of embedded and cyberphysical systems often
+rely on functional notions such as stream-processing
+functions~\cite{DBLP:series/mcs/BroyS01,DBLP:conf/csdm/Broy12}, the
+application of functional programming in the practical development of
+such systems has, so far, been limited. One of the most advanced
+programming language in this direction is Ivory, which was used in the
+development autonomous vehicles~\cite{pike2014}.  Ivory is a
+restricted version of the C programming language, embedded in Haskell.
+It provides access to the low level operations necessary for embedded
+system programming, but still enforces good programming practice, such
+as disallowing pointer arithmetic, with a rich type system.
 
-Then I would provide all these stuff about functional language
+Ivory does not, however, deal with the integration of 
+continuous and discrete time, which is fundamental for the
+development of a cyberphysical system. For example,
+In a car, continuous signals such as the velocity, acceleration, etc.
+mix with the discrete steps of the digital controller.
 
-then why you cannot use it really for autonomous vehicle control
+In this paper, we investigate the use of functional programming
+in a domain where the interaction between continous and discrete signals
+is of fundamental importance. We build a vehicle controller capable
+of both autonomous vehicle control and multi-vehicle communication,
+such as the coordination in platooning situations.
 
-and then introduce what is FRP
+Our approach is based on Functional Reactive Programming
+(FRP)~\cite{hudak2003arrows,hudak2000haskell}.
+The fundamental idea of FRP is to extend the classic building blocks 
+of functional programming (\eg monads, arrows,
+applicatives)
+with the abstraction of a \emph{signal} to
+describe time-varying values. FRP programs can be exceptionally
+efficient.  For example, a network controller recently implemented as
+an FRP program on a multicore processor outperforms any other such
+controller existing today~\cite{Voellmy:2012:SSD:2377677.2377735}.
 
-then go back to our implementation, and explain what we obtain. why is this even cool? very simple controller only XX lines of code
-
-very modular, easily extendable to model communications - again say more about simulation where is coming from and what are benefits
-
-practically, all is there, just has to be rearranged and better "connected"  }
-
-
-
-
-%static program analysis can help
-To ensure that such systems are indeed safe, there has been much work in static program analysis .
-One major advancement from the programming languages community towards bug-free software has been the development of functional languages.
-Functional languages use language features to control the space of possible programs via abstraction, which can prevent many common programming errors.
-
-%a good 'static analysis' tool is to use a functional language
-One static analysis tool that has proved useful is a strong type system as featured in functional languages~\cite{cardelli1996type}.
-Another example is functional purity, which reduces the possibility of malformed state that can cause unexpected behavior.
-In the simplest case, the higher-order function \texttt{map} common to functional languages is an abstraction for looping (among other functions) that eliminates the typical intermediate counter.
-This helps to eliminate the possibility for runtime index out of bounds errors due to mistaken reasoning about edge cases.
-
-%as an example, look at hardware and low level code
-Because of these safety benefits, functional languages are now also used for critical systems such as hardware.
-ClaSH was used to program an FPGA to solve N Queens in a purely functional language~\cite{clash2014}.
-FPGA programs can be difficult because of the low level memory and instruction management, but functional languages can abstract some of these issues away from the user.
-Another example is Ivory, a functional language that compiles directly to C code that was used to build safer autonomous vehicles~\cite{pike2014}
-This language still provides access to the low level operations necessary for embedded system programming, but still enforces good programming practice, such as disallowing pointer arithmetic, with a rich type system.
-%TODO include ref to {Kansas Lava}
-
-%when applying FP to reactive systems purity is hard
-However, despite these advantages of functional programming, there are some difficulties when applying this approach to reactive systems.
-One difficulty is the insistence on purity, which separates data manipulation code from sources of unknown data, such as IO.
-Since reactive systems require a constant interaction between the environment and the agent, purity is sometimes seen as an obstacle.
-
-%also there are many types of time
-Furthermore, reactive systems require a consistent notion of time, communication, and actions.
-For example, it is sometimes necessary to control a vehicle as an isolated agent, but it is also desirable to platoon a group a vehicles.
-This requires opening communication channels between vehicles, introducing the sensing and communication rates.
-Furthermore, today's systems also need both: continuous and discrete time behaviors.
-In a car, the steering wheel should act as a continuous signal, but a human-in-the-loop system~\cite{li2014synthesis} it should additionally respond to discrete user actions, such as turning on a directional.
-Functional Reactive Programming resolves this mismatch by creating an abstraction of time on the type level that allows for both continuous and discrete behaviors.
-%TODO  motivate on some example (synchronous vs asynchronous, real vs discrete),
-
-%but FRP can help us
-A solution to this problem is to use a paradigm called Functional Reactive Programming (FRP)~\cite{hudak2003arrows,hudak2000haskell}.
-FRP uses abstractions of computations available in functional languages (\eg monads, arrows, applicatives) to allow for a separation between environment handling and computation.
-This separation makes functional languages powerful in a number of different reactive settings.
-In fact, the ability to separate types of computations can also be helpful in building reactive system that are easily to analyze.
-
-%What did we do?
 We have built a library, \ourLib, to use FRP to control a vehicle inside a simulation.
-We demonstrate the flexibility of our library in the sequel.
-In addition to single vehicle control, \ourLib allows for easy simulation on open communication channels between vehicles.
-This is a critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{?}.
-As we will show, using \ourLib provides a simple interface for simulating this communication, which can ease the development task for testing novel algorithms in this domain.
+The library interfaces Haskell FRP programs to TORCS, The Open Racing Car Simulator, an open-source vehicle simulator~\cite{torcs}.
+TORCS has been used in the Simulated Car Racing Championship competition~\cite{SCRC}.
+Through \ourLib, the Haskell program has access to the sensors and actuators of the car, as well
+as the communication channels between different vehicles.
+Such a simulator is a  critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{?}.
 
-%we will explain FRP in depth in the sequel
-In summary, we make the following contributions:
-
-\begin{itemize}
-\item An introduction to Functional Reactive Programming (FRP) using a simple reactive vehicle controller. We describe how FRP allows for easier reasoning about correctness properties in reactive systems.
-%\cfelix{this is the most important part, almost sure that nobody of the reviews will know about; go through the very basics, remember these are embedded systems people}
-
-\item A library, \ourLib, for connecting Haskell to The Open Racing Car Simulator (TORCS), encouraging further research into the use of functional languages for the development of safer autonomous vehicle controllers. As another extension, our library supports communication between vehicle controllers, allows for research into platooning strategies.
-
-\item A demonstration of an FRP vehicle controller, highlighting the elegance and simplicity of the framework. Both principles
-  make the design resistant against errors, while at the same time it stays easily extendable without breaking the remaining system.
-
-\end{itemize}
+We report on experience with a case study, in which we implement a controller for a car on an empty race trace. Our controller successfully navigates, with considerable speed and finesse (see Fig.~\ref{fig:race}). Furthermore, the case study illustrates that the functional approach indeed leads to elegant, easily
+understandable, and safe code.
 
 \begin{figure}[t]
 \includegraphics[width=0.45\textwidth]{figs/racing.png}
