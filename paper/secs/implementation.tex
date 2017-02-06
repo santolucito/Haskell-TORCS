@@ -1,8 +1,9 @@
 \section{Implementation}
 
 We provide an open source library, \ourLib, \footnote{\url{https://github.com/santolucito/Haskell-TORCS}} for interfacing Haskell FRP programs to TORCS, The Open Racing Car Simulator, which is an existing open source vehicle simulator~\cite{torcs}.
-\cmark{see this paper for a description of TORCS, we should make something like this ~\cite{xu2016experimental}.}
-
+TORCS uses a specialized physics engine for vehicle simulations. 
+The next planned release of TORCS is slated in includes levels of detail such a variable tire traction based on environmental temperature, tire temperature, tire wear, and surface conditions\footnote{http://www.berniw.org/trb/forum/showthread.php?topicid=4744}.
+Controllers can be programmed in C or \CC directly into the source code of TORCS.
 When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
 While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell.
 
