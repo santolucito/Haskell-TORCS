@@ -14,13 +14,13 @@ including synchronous programming languages like Lustre~\cite{conf/popl/CaspiPHP
 and Esterelle~\cite{conf/concur/BerryC84},
 hardware-oriented versions of imperative programming languages like
 SystemC~\cite{open2006ieee}, and visual languages like MSCs and Stateflow-charts~\cite{harel2003message,journals/scp/Harel87}.
-The question which programming paradigm is best-suited to write
+The question of which programming paradigm is best-suited to write
 easy-to-understand, bug-free code is still largely unresolved.
 
 In the development of other forms of critical software, outside the
 embedded domain, developers increasingly turn to functional
 programming (cf.~\cite{financialsoftware}).  The strong type system in functional
-languages~\cite{cardelli1996type} largely eliminates runtime errors.
+languages largely eliminates runtime errors~\cite{cardelli1996type}.
 Higher-order functions like \texttt{map} often eliminate the need for
 explicit index counters, and, hence, the risk of ``index out of
 bounds'' errors.  Functional purity reduces the possibility of
@@ -38,14 +38,15 @@ It provides access to the low level operations necessary for embedded
 system programming, but still enforces good programming practice, such
 as disallowing pointer arithmetic, with a rich type system.
 
-Ivory does not, however, deal with the integration of 
+Ivory does not, however, have an explicit notion of time.
+It cannot then deal directly with the integration of 
 continuous and discrete time, which is fundamental for the
 development of a cyberphysical system. For example,
-In a car, continuous signals such as the velocity, acceleration, etc.
+In a car, continuous signals such as the velocity or acceleration
 mix with the discrete steps of the digital controller.
 
 In this paper, we investigate the use of functional programming
-in a domain where the interaction between continous and discrete signals
+in a domain where the interaction between continuous and discrete signals
 is of fundamental importance. We build a vehicle controller capable
 of both autonomous vehicle control and multi-vehicle communication,
 such as the coordination in platooning situations.
@@ -63,13 +64,14 @@ controller existing today~\cite{Voellmy:2012:SSD:2377677.2377735}.
 
 We have built a library, \ourLib, to use FRP to control a vehicle inside a simulation.
 The library interfaces Haskell FRP programs to TORCS, The Open Racing Car Simulator, an open-source vehicle simulator~\cite{torcs}.
-TORCS has been used in the Simulated Car Racing Championship competition~\cite{SCRC}.
+TORCS has been used in the Simulated Car Racing Championship competition~\cite{SCRC}, as well as other autonomous vehicle research projects~\cite{xu2016experimental,OnievaPAMP09,conf/cig/CardamoneLL09,conf/cig/MunozGS10}. 
 Through \ourLib, the Haskell program has access to the sensors and actuators of the car, as well
 as the communication channels between different vehicles.
 Such a simulator is a  critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{?}.
 
-We report on experience with a case study, in which we implement a controller for a car on an empty race trace. Our controller successfully navigates, with considerable speed and finesse (see Fig.~\ref{fig:race}). Furthermore, the case study illustrates that the functional approach indeed leads to elegant, easily
-understandable, and safe code.
+We report on experience with a case study, in which we implement a controller for a car on an empty race trace. 
+Our controller successfully navigates the TORCS preloaded tracks with a reasonable speed and finesse, similar to that expected of an average driver (see Fig.~\ref{fig:race}). 
+Furthermore, the case study illustrates that the functional approach indeed leads to elegant, easily understandable, and safe code.
 
 \begin{figure}[t]
 \includegraphics[width=0.45\textwidth]{figs/racing.png}
