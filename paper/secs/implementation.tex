@@ -7,7 +7,7 @@ In these competitions, a car is controlled via a socket that sends the sensor da
 
 While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell. 
 As backend, we use the FRP library Yampa~\cite{courtney2003yampa}. 
-However, due to the unique programming style provided by Haskell and its purity, every other FRP library is suited as well, with respect to purely syntactic adaptions.
+As a convenient result of to the unique programming style provided by Haskell and its purity, any other FRP library is suited as well, with respect to purely syntactic adaptions.
 With the assistance of FRP, we create the  vehicle controller in a principled way that allows users to manipulated sensor data in a transparent and well structured environment.
 
 %Although the existing tool is specifically tailored to be used with our controller within the Yampa library,
@@ -18,4 +18,4 @@ With the assistance of FRP, we create the  vehicle controller in a principled wa
 
 The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
 Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
-The access is mutual exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. % to manage these channels between the threads of the different vehicles.
+The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. % to manage these channels between the threads of the different vehicles.

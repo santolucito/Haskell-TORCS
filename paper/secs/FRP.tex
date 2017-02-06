@@ -18,7 +18,7 @@ For example, the type \texttt{Signal Image} represents a video, while \texttt{Si
 \subsection{Arrowized FRP}
 
 There are many types of FRP based on different abstractions from type theory.
-Expressive abstractions, such as monads, allow to handle complex signal processing~\cite{van2014monadic}. However, for most applications they are far too expressive.
+Expressive abstractions, such as monads, allow to handle complex signal flow manipulation~\cite{van2014monadic}. However, for most applications they are far too expressive.
 We instead focus on a FRP library, Yampa, using the arrow abstraction, the so called Arrowized FRP~\cite{hudak2003arrows}.
 Arrows generally run faster with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
 This more restrictive language, makes it harder for the programmer to introduce errors.

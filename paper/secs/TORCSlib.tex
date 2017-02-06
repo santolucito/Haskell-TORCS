@@ -82,13 +82,14 @@ gas (speed, steer) =
 
 Thanks to functional language's exceptional support for parallelism, controlling multiple vehicles in a multi-threaded environment is exceedingly simple. 
 In our library API, the user simply uses \texttt{startDrivers} rather than \texttt{startDriver}, and passes a list of \texttt{Driver} signal functions ``driving'' together.
-By that, we easily let race various implementations against each other, or build a vehicle platooning controller.
+In this way, we easily let various implementations race against each other, or build a vehicle platooning controller.
 In the latter, the user can even extend the implementation to simulate communication between the vehicles.
 
 Our library already provides a simple interface for simulating communication between vehicles.
 In order to broadcast a message to the other vehicles in the simulation, the controller simply broadcasts a message via the \texttt{broadcast} field of \texttt{DriveState}.
 That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
-Users now are able to implement small functions, similar to as in Listing~\ref{lst:platoon}. They then check if anyone has requested for the platoon to go faster.
+Users now are able to implement functions, similar to as in Listing~\ref{lst:platoon} to communicate between vehicles.
+In this example, a vehicle checks if anyone else has requested for the platoon to go faster.
 
 \begin{lstlisting}[float,floatplacement=T,caption=Communicating between controllers, label=lst:platoon]
 adjustSpeed :: (Communications, Double) -> Double
@@ -96,8 +97,6 @@ adjustSpeed (comms, oldSpeed) =
   if any (map (== "faster")) cs then s + 10 else s
 \end{lstlisting}
 
-We allow all vehicles in the simulation to communicate irrespective of
-distance and with zero packet loss.  However, users may feel free to
-implement and simulate unreliable communications, or distance
-constraints.  Thereby, due to the purity and modularity of FRP, new
-extensions are guaranteed to keep the existing code base intact.
+We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
+However, users are free to implement and simulate unreliable communications, or distance constraints.  
+%Thereby, due to the purity and modularity of FRP, new extensions are guaranteed to keep the existing code base intact.
