@@ -19,7 +19,7 @@ easy-to-understand, bug-free code is still largely unresolved.
 
 In the development of other forms of critical software, outside the
 embedded domain, developers increasingly turn to functional
-programming (cf.~\cite{financialsoftware}).  The strong type system in functional
+programming (cf.~\cite{frankau2009commercial}).  The strong type system in functional
 languages largely eliminates runtime errors~\cite{cardelli1996type}.
 Higher-order functions like \texttt{map} often eliminate the need for
 explicit index counters, and, hence, the risk of ``index out of
@@ -67,7 +67,7 @@ The library interfaces Haskell FRP programs to TORCS, The Open Racing Car Simula
 TORCS has been used in the Simulated Car Racing Championship competition~\cite{SCRC}, as well as other autonomous vehicle research projects~\cite{xu2016experimental,OnievaPAMP09,conf/cig/CardamoneLL09,conf/cig/MunozGS10}. 
 Through \ourLib, the Haskell program has access to the sensors and actuators of the car, as well
 as the communication channels between different vehicles.
-Such a simulator is a  critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{?}.
+Such a simulator is a  critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{kamali2016formal}.
 
 We report on experience with a case study, in which we implement a controller for a car on an empty race trace. 
 Our controller successfully navigates the TORCS preloaded tracks with a reasonable speed and finesse, similar to that expected of an average driver (see Fig.~\ref{fig:race}). 
