@@ -86,6 +86,15 @@ In this case, the user will need to be able to simulate communication between th
 Our library provides a simple interface for simulating communication between vehicles.
 In order to broadcast a message to the other vehicles in the simulation, the controller simply writes a message to the \texttt{broadcast} field of the output \texttt{DriveState}.
 That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
+A user could then simply implement some small function similar to as in Listing~\ref{lst:platoon}, which checks to see if anyone has requested for the platoon to go faster.
+
+\begin{lstlisting}[float,floatplacement=T,caption=Communicating between controllers, label=lst:platoon]
+adjustSpeed :: (Communications,Double) -> Double
+adjustSpeed (comms,oldSpeed) =
+  if any (map (=="faster")) cs
+  then s+10
+  else s
+\end{lstlisting}
 
 We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
 If a user wishes to simulate unreliable communications, or distance constraints, this can be simulated on a case-by-case basis.

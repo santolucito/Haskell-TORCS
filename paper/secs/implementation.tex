@@ -5,6 +5,7 @@ The library is available at \url{https://github.com/santolucito/Haskell-TORCS}.
 
 The Open Racing Car Simulator (TORCS) is an existing open source vehicle simulator~\cite{torcs}.
 It has been used in the Simulated Car Racing Championship competition~\cite{SCRC}.
+\cmark{see this paper for a description of TORCS, we should make something like this ~\cite{xu2016experimental}.}
 For these competitions, a car can be controller via a socket that sends the sensor data from the vehicle and can receive and process the driving commands.
 
 
@@ -20,7 +21,7 @@ It may also be interesting to build more lower level binding to allow non-FRP Ha
 While FRP is one of the simplest interfaces for reactive systems programming in functional languages, it is also possible to use functional language in this context without FRP.
 
 
-The communication channels are simulated as a map from vehicle id to messages.
+The communication channels are simulated as a hash map (Data.Map) from vehicle id to messages.
 Each vehicle is given write permission to their unique channel, that all others have read-only permissions.
 This ensures that no messages will be overwritten.
 We use Haskell's \texttt{MVar}, a threadsafe shared memory library to manage these channels between the threads of the different vehicles.
