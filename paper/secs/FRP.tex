@@ -72,7 +72,7 @@ The function \texttt{turn} already is on the signal level (has a SF type). Hence
 
 \subsection{Stateful FRP}
 
-To avoid obstacles, imagine an \texttt{avoid'} function as shown in Listing~\ref{lst:loop}, which requires two images to calculate the adjusted steering command. 
+To avoid obstacles, imagine an \texttt{avoid2} function as shown in Listing~\ref{lst:loop}, which requires two images to calculate the adjusted steering command. 
 Thus, we need a mechanism to maintain state between each processing step.
 Two images would be necessary to filter noise in the image, or calculates the velocity of an approaching obstacle.
 To implement it, we use an abstraction called \texttt{ArrowLoop} to  save the previous state of the image for the next processing step.
@@ -86,7 +86,7 @@ myDriver = proc image -> do
   rec
     oldI          <- iPre null  -< image
     basicSteer    <-      turn  -< image
-    adjustedSteer <- arr avoid' -< (image, oldI, basicSteer)
+    adjustedSteer <- arr avoid2 -< (image, oldI, basicSteer)
   returnA -< adjustedSteer
 \end{lstlisting}
 
