@@ -1,23 +1,3 @@
 \section{Implementation}
-
-We provide an open source library, \ourLib\footnote{\url{https://github.com/santolucito/Haskell-TORCS}}, for interfacing Haskell FRP programs to TORCS, The Open Racing Car Simulator, which is an existing open source vehicle simulator~\cite{torcs}.
-TORCS uses a specialized physics engine for vehicle simulations. 
-The next planned release of TORCS is slated in includes levels of detail such a variable tire traction based on environmental temperature, tire temperature, tire wear, and surface conditions\footnote{http://www.berniw.org/trb/forum/showthread.php?topicid=4744}.
-Controllers can be programmed in C or \CC directly into the source code of TORCS.
-When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
 %While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell.
 
-As backend, we use the FRP library Yampa~\cite{courtney2003yampa}. 
-As a convenient result of to the unique programming style provided by Haskell and its purity, any other FRP library is suited as well, with respect to purely syntactic adaptions.
-With the assistance of FRP, we create the  vehicle controller in a principled way that allows users to manipulated sensor data in a transparent and well structured environment.
-
-%Although the existing tool is specifically tailored to be used with our controller within the Yampa library,
-%  minor modifications can allow the tool to easily work with other FRP libraries.
-
-%It is possible to build more lower level bindings to allow non-FRP Haskell program to interface with TORCS.
-%While FRP is one of the simplest interfaces for reactive systems programming in functional languages, it is also possible to use functional language in this context without FRP.
-
-In addition to the functionality realized in past TORCS bindings, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communications.
-The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
-Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
-The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. % to manage these channels between the threads of the different vehicles.
