@@ -5,7 +5,7 @@ TORCS uses a specialized physics engine for vehicle simulations.
 The next planned release of TORCS is slated in includes levels of detail such a variable tire traction based on environmental temperature, tire temperature, tire wear, and surface conditions\footnote{http://www.berniw.org/trb/forum/showthread.php?topicid=4744}.
 Controllers can be programmed in C or \CC directly into the source code of TORCS.
 When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
-While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell.
+%While there are existing bindings to these socket protocols for languages such as python~\cite{snakeoil,pyscrc}, we present the first such binding for the functional programming language Haskell.
 
 As backend, we use the FRP library Yampa~\cite{courtney2003yampa}. 
 As a convenient result of to the unique programming style provided by Haskell and its purity, any other FRP library is suited as well, with respect to purely syntactic adaptions.

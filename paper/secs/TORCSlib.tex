@@ -1,13 +1,14 @@
 \section{\ourLib}
 
-We developed a library to program controllers for autonomous vehicles using FRP, and connecting their controllers to the TORCS vehicle simulator.
+We developed a library to program controllers for autonomous vehicles using FRP, and connecting these controllers to the TORCS~\cite{torcs} vehicle simulator.
 This library, \mbox{\ourLib}, uses Yampa as the core FRP library, though its structure can easily be adapted to any other Haskell FRP library.
+Although there are other libraries for writing controller in TORCS, we are the first to support FRP and provide
 
 \subsection{Basics}
 
 To interface with \ourLib, a user must implement a controller that will process the \texttt{CarState}, which contains all the data available from the sensors.
-The controller should then output a commands to the vehicle, as a \texttt{DriveState}.
-This is transformation is succinctly described as the now familiar \textit{signal function} from FRP.
+The controller should then output a \texttt{DriveState}, which contains all the data for controlling the vehicle.
+This transformation is succinctly described as the now familiar \textit{signal function}.
 The core functionality of \ourLib is captured in the function \texttt{startDriver}, which will launch a controller in the simulator.
 This function automatically connects a \texttt{Driver} to TORCS, which results in continuous \texttt{IO()} actions, the output type of this function.
 
@@ -25,9 +26,7 @@ A full description of the interface is available in the Simulated Car Racing Com
 
 \subsection{Case Study : Driving}
 
-As a demonstration of the \ourLib library in use, we present a case study on a simple controller for a car on an empty race track.
-We implement the controller in FRP using Yampa, as shown in Listing~\ref{lst:driver}. 
-It is connected to TORCS using our library, \ourLib.
+As a demonstration of the \ourLib library in use, we present a case study on a simple controller for a car on an empty race track, as shown in Listing~\ref{lst:driver}. 
 The code is complete and immediately executable as-is together with an installation of TORCS.
 Our controller successfully navigates, with some speed and finesse, a vehicle in track, as shown in Fig.~\ref{fig:race}.
 The controller uses \texttt{ArrowLoop} to keep track of the current gear of the car.
