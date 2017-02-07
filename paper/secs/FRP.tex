@@ -48,14 +48,6 @@ The syntax provides a composition environment, in which the programmer just mana
 Inputs are read in from the right hand side, and piped to the left hand side (\texttt{output <- function -< input}).
 A demonstration is given in Listing~\ref{lst:arrows}.
 
-\begin{lstlisting}[float,floatplacement=h!,caption=Basic Arrowized FRP syntax,label=lst:arrows]
-myDriver :: SF Image Steer
-myDriver = proc image -> do
-  basicSteer    <-     turn  -< image
-  adjustedSteer <- arr avoid -< (image, basicSteer)
-  returnA -< adjustedSteer
-\end{lstlisting}
-
 The example introduces 
 %
 \begin{lstlisting}
@@ -70,6 +62,15 @@ In Listing~\ref{lst:arrows}, this \texttt{avoid} function is lifted to the signa
 \end{lstlisting}
 %
 The function \texttt{turn} already is on the signal level (has a SF type). Hence, we do not need to lift it.
+
+\begin{lstlisting}[float,floatplacement=h!,caption=Basic Arrowized FRP syntax,label=lst:arrows]
+myDriver :: SF Image Steer
+myDriver = proc image -> do
+  basicSteer    <-     turn  -< image
+  adjustedSteer <- arr avoid -< (image, basicSteer)
+  returnA -< adjustedSteer
+\end{lstlisting}
+
 
 \subsection{Stateful FRP}
 

@@ -1,7 +1,6 @@
 \section{\ourLib}
 We provide an open source library, \ourLib\footnote{\url{https://github.com/santolucito/Haskell-TORCS}}, for interfacing Haskell FRP programs to TORCS, The Open Racing Car Simulator, which is an existing open source vehicle simulator~\cite{torcs}.
-This library, which we call \mbox{\ourLib}, uses Yampa~\cite{courtney2003yampa} as the core FRP library, though its structure can easily be adapted to any other Haskell FRP library.
-We now explain the functionality provided by \ourLib, and highlight the ability of FRP to create modular, flexible, and clean controllers for autonomous vehicles.
+We now explain the functionality provided by our library, and highlight the ability of FRP to create modular, flexible, and clean controllers for autonomous vehicles.
 
 \subsection{Basics}
 
@@ -107,6 +106,8 @@ However, users are free to implement and simulate unreliable communications, or 
 %Thereby, due to the purity and modularity of FRP, new extensions are guaranteed to keep the existing code base intact.
 
 \subsection{Implementation} 
+
+\mbox{\ourLib} uses Yampa~\cite{courtney2003yampa} as the core FRP library, though its structure can easily be adapted to any other Haskell FRP library.
 
 TORCS uses a specialized physics engine for vehicle simulations, that includes levels of detail as fine grained as tire temperatures effect on traction. 
 When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
