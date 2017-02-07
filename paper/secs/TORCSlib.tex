@@ -1,8 +1,8 @@
 \section{\ourLib}
 TORCS, The Open Racing Car Simulator, is an existing open source vehicle simulator~\cite{torcs} that has bindings for various languages~\cite{SCRC}.
 We provide the first bindings for Haskell, and further extend this into a full library for multi-vehicle simulations.
-The library is an open source library, called \ourLib, is publicly available at \url{https://github.com/santolucito/Haskell-TORCS}.
-We now explain the functionality provided by our library, and highlight the ability of FRP to create modular, flexible, and clean controllers for autonomous vehicles.
+The library is an open source library, called \ourLib, and publicly available at \url{https://github.com/santolucito/Haskell-TORCS}.
+We now explain the functionality provided by our library, and highlight the ability of FRP to create modular and flexible controllers with clean code for autonomous vehicles.
 
 \subsection{Basics}
 
@@ -26,9 +26,9 @@ A full description of the interface is available in the Simulated Car Racing Com
 
 \subsection{Case Study : Driving}
 
-As a demonstration of the \ourLib library in use, we present a case study on a simple controller for a car on an empty race track, as shown in Listing~\ref{lst:driver}. 
+As a demonstration of the \ourLib library in use, we implemented a simple controller, shown in Listing~\ref{lst:driver}. 
 The code is complete and immediately executable as-is together with an installation of TORCS.
-Our controller successfully navigates, with some speed and finesse, a vehicle in track, as shown in Fig.~\ref{fig:race}.
+Our controller successfully navigates, with some speed and finesse, a vehicle in track, as shown in Fig.~\ref{fig:race} along with a video demonstration\footnote{\url{http://www.marksantolucito.com/torcsdemo}}.
 The controller uses \texttt{ArrowLoop} to keep track of the current gear of the car.
 Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
 In general, the \texttt{ArrowLoop} can be used to maintain any state that may be of interest in a future processing step.
@@ -88,10 +88,11 @@ Our library already provides a simple interface for simulating communication bet
 In order to broadcast a message to the other vehicles in the simulation, the controller simply broadcasts a message via the \texttt{broadcast} field of \texttt{DriveState}.
 That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
 
-Users are now able to implement functions, as in Listing~\ref{lst:platoon}, to communicate between vehicles.
-In this example, a vehicle checks if a collision is imminent, and can request for the other cars in the platoon to go faster and move out of the way.
+A fragment of communication code is given in Listing~\ref{lst:platoon}, to pass messages between vehicles. 
+In this fragment, a vehicle checks if a collision is imminent, and can request for the other cars in the platoon to go faster and move out of the way.
 Every vehicle also checks if any other car has requested for the platoon to speed up, and will adjust its own speed accordingly.
 These functions can be added to a controller, like the one in Listing~\ref{lst:driver}, with little effort.
+
 \begin{lstlisting}[float,floatplacement=T,caption=Communicating between controllers, label=lst:platoon]
 request :: Double -> Message
 request dist = 
