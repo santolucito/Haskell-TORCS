@@ -26,8 +26,10 @@ data DriveState = DriveState {
   ,meta      :: Double
   ,break     :: Double
   ,steer     :: Double
-  ,broadcast :: String
+  ,broadcast :: Message
 } deriving (Show)
+
+type Message = String
 
 defaultDriveState = DriveState {
   gear = 1
