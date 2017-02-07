@@ -1,18 +1,7 @@
 \section{\ourLib}
 We provide an open source library, \ourLib\footnote{\url{https://github.com/santolucito/Haskell-TORCS}}, for interfacing Haskell FRP programs to TORCS, The Open Racing Car Simulator, which is an existing open source vehicle simulator~\cite{torcs}.
-We developed a library to program controllers for autonomous vehicles using FRP, and connecting these controllers to the TORCS~\cite{torcs} vehicle simulator.
 This library, which we call \mbox{\ourLib}, uses Yampa~\cite{courtney2003yampa} as the core FRP library, though its structure can easily be adapted to any other Haskell FRP library.
-
-\subsection{Implementation} 
-
-TORCS uses a specialized physics engine for vehicle simulations, that includes levels of detail as fine grained as tire temperatures effect on traction. 
-When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
-So too, \ourLib communicates over these sockets to control a vehicles inside the TORCS simulations.
-
-In addition to the core controller functionality, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communication.
-The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
-Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
-The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. 
+We now explain the functionality provided by \ourLib, and highlight the ability of FRP to create modular, flexible, and clean controllers for autonomous vehicles.
 
 \subsection{Basics}
 
@@ -116,3 +105,14 @@ adjustSpeed (comms, oldSpeed) =
 We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
 However, users are free to implement and simulate unreliable communications, or distance constraints.  
 %Thereby, due to the purity and modularity of FRP, new extensions are guaranteed to keep the existing code base intact.
+
+\subsection{Implementation} 
+
+TORCS uses a specialized physics engine for vehicle simulations, that includes levels of detail as fine grained as tire temperatures effect on traction. 
+When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
+So too, \ourLib communicates over these sockets to control a vehicles inside the TORCS simulations.
+
+In addition to the core controller functionality, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communication.
+The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
+Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
+The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. 
