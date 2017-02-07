@@ -17,6 +17,8 @@ For example, the type \texttt{Signal Image} represents a video, while \texttt{Si
 
 \subsection{Arrowized FRP}
 
+To better understand our library 
+
 There are many types of FRP based on different abstractions from type theory.
 Expressive abstractions, such as monads, allow for complex manipulation of signal flows~\cite{van2014monadic}. 
 However, for most applications they are far too expressive.
@@ -44,7 +46,7 @@ We omit an implementation, as the details of the data transformation are not rel
 
 Haskell provides special syntax for Arrowized FRP, which mimics the structure of control flow charts.
 The syntax provides a composition environment, in which the programmer just manages the composition of arrow functions.
-Inputs are read in from the right hand side, and piped to the left hand side.
+Inputs are read in from the right hand side, and piped to the left hand side (output <- function -< input).
 A demonstration is given in Listing~\ref{lst:arrows}.
 
 \begin{lstlisting}[float,floatplacement=h!,caption=Basic Arrowized FRP syntax,label=lst:arrows]
@@ -72,8 +74,8 @@ The function \texttt{turn} already is on the signal level (has a SF type). Hence
 
 \subsection{Stateful FRP}
 
-To avoid obstacles, imagine an \texttt{avoid2} function as shown in Listing~\ref{lst:loop}, which requires two images to calculate the adjusted steering command. 
-Thus, we need a mechanism to maintain state between each processing step.
+To avoid obstacles on the road, we might write an \texttt{avoid2} function as shown in Listing~\ref{lst:loop}, which requires two images to calculate the adjusted steering command. 
+For this, we need a mechanism to maintain state between each processing step.
 Two images would be necessary to filter noise in the image, or calculates the velocity of an approaching obstacle.
 To implement it, we use an abstraction called \texttt{ArrowLoop} to  save the previous state of the image for the next processing step.
 The syntax is presented in Listing~\ref{lst:loop}.

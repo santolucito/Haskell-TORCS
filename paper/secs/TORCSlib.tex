@@ -5,11 +5,11 @@ This library, \mbox{\ourLib}, uses Yampa as the core FRP library, though its str
 
 \subsection{Basics}
 
-To interface with \ourLib, a user implements a controller that processes all data available from the sensors given via \texttt{CarState}. 
-Next, he or she outputs commands to the vehicle using \texttt{DriveState}.
-Both structures represent \textit{signal function} in FRP.
-The core functionality of \ourLib is captured in the function \texttt{startDriver}, which launches the controller inside the simulator.
-The \texttt{startDriver} function automatically connects a \texttt{Driver} to TORCS, which resolves to the right continuous \texttt{IO} actions.
+To interface with \ourLib, a user must implement a controller that will process the \texttt{CarState}, which contains all the data available from the sensors.
+The controller should then output a commands to the vehicle, as a \texttt{DriveState}.
+This is transformation is succinctly described as the now familiar \textit{signal function} from FRP.
+The core functionality of \ourLib is captured in the function \texttt{startDriver}, which will launch a controller in the simulator.
+This function automatically connects a \texttt{Driver} to TORCS, which results in continuous \texttt{IO()} actions, the output type of this function.
 
 \vspace{0.2em}
 \begin{lstlisting}
