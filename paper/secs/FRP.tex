@@ -1,11 +1,11 @@
 \section{Functional Reactive Programming}
 
-The most common solution for the construction of reactive systems are call-back frameworks, embedded into a loop.
+The most common solution for the construction of reactive systems in an imperative setting are call-back frameworks, embedded into a loop.
 The call-backs are either used to query the state of variables, or to change them.
-The approach is well suited for rapid prototyping of small systems
-However, tracing the result's behavior over time gets unmanageable complex rapidly for larger systems.
-Functional Reactive Programming instead introduces a concrete abstraction of time that allows the programmer to safely manipulate time-varying values.
+This imperative approach is well suited for rapid prototyping of small systems.
+However, tracing behaviors over time quickly becomes unmanageably complex for larger systems.
 
+Functional Reactive Programming instead introduces a concrete abstraction of time that allows the programmer to safely manipulate time-varying values. 
 The key abstraction is given by a \textit{signal}, providing the programmer with simple type interface:
 
 \begin{lstlisting}

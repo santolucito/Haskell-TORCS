@@ -69,9 +69,10 @@ Through \ourLib, the Haskell program has access to the sensors and actuators of 
 as the communication channels between different vehicles.
 Such a simulator is a  critical component of modern autonomous vehicle research, especially towards the goal of safe platooning algorithms~\cite{kamali2016formal}.
 
-We report on experience with a case study, in which we implement a controller for a car on an empty race trace. 
-Our controller successfully navigates the TORCS preloaded tracks with a reasonable speed and finesse, similar to that expected of an average driver (see Fig.~\ref{fig:race}). 
+We report on our experience with two case studies, one in which we implement a controller for a solo car, and another for multi-vehicle platooning using a communication channel between the cars.
+Our controller successfully navigates the TORCS preloaded tracks with reasonable speed and finesse while avoiding collisions (see Fig.~\ref{fig:race}).
 Furthermore, the case study illustrates that the functional approach indeed leads to elegant, easily understandable, and safe code.
+The ability to run full simulations for solo and platooning vehicles is a critical piece to advancing the state of the art in using FRP for autonomous vehicle control.
 
 \begin{figure}[t]
 \includegraphics[width=0.45\textwidth]{figs/racing.png}

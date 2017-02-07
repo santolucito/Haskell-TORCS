@@ -95,6 +95,8 @@ In this example, a vehicle checks if anyone else has requested for the platoon t
 adjustSpeed :: (Communications, Double) -> Double
 adjustSpeed (comms, oldSpeed) =
   if any (map (== "faster")) cs then s + 10 else s
+
+requestIncrease
 \end{lstlisting}
 
 We allow all vehicles in the simulation to communicate irrespective of distance and with zero packet loss.
