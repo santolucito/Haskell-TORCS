@@ -3,19 +3,18 @@
 TORCS has been proven to provide an expressive framework for the research community~\cite{OnievaPAMP09,conf/cig/CardamoneLL09,conf/cig/MunozGS10}. 
 Notably, it has even been used for formal verification of platoons~\cite{kamali2016formal,xu2016experimental}. 
 None of these works have used FRP as the language for the controller.
-With the assistance of FRP, we create the  vehicle controller in a principled way that allows users to manipulate sensor data in a transparent and well structured environment.
-
-FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zou2016}, where FRP was extended to prioritize functions for timing constraints. However, due to the lack of a compatible simulator, the vehicle simulation never was implemented. 
-
-FRP has also been used for embedded systems~\cite{helbling2016juniper} and networking~\cite{voellmy2012scalable}.
-The FRP networking library took advantage of Haskell's multicore support and significantly outperformed competing tools written in \CC and Java.
+With the assistance of FRP, we build vehicle controllers in a principled way that allows users to manipulate sensor data in a transparent and well structured environment.
 
 To the best of our knowledge this is the first FRP-based vehicle simulator.
 Although there are many bindings to various vehicle simulators, these tend to use imperative languages.
 For instance, TORCS allows users to directly edit the source code and add a new car in \CC.
 There are also TORCS bindings for python, java, and matlab, which have been used in the SCRC competition~\cite{SCRC}.
 
-The videogame GTA~\cite{gtaV} has also been used to train image recognition software for autonomous vehicles~\cite{gtaPrinceton}.
+FRP specifically has been proposed as a tool for vehicle control~\cite{kazemi2016,zou2016}, where FRP was extended to prioritize functions for timing constraints. However, due to the lack of a compatible simulator, the vehicle simulation never was implemented. 
+FRP has also been used for embedded systems~\cite{helbling2016juniper} and networking~\cite{voellmy2012scalable}.
+The FRP networking library took advantage of Haskell's multicore support and significantly outperformed competing tools written in \CC and Java.
+
+The videogame Grand Theft Auto (GTA)~\cite{gtaV} has also been used to train image recognition software for autonomous vehicles~\cite{gtaPrinceton}.
 While GTA is a professionally produced game with more attractive graphics, it presents a different set of issues.
 First, it is proprietary software not designed for autonomous vehicle research, and therefore the ability to build sensor based controllers is more restricted - so far a controller can only use the images from gameplay. 
 Second, unlike TORCS, which is designed primarily as a vehicle simulator, GTA's physics engine is tuned to maximize entertainment.

@@ -115,4 +115,6 @@ So too, \ourLib communicates over these sockets to control a vehicles inside the
 In addition to the core controller functionality, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communication.
 The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
 Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
-The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library. 
+The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library.
+This ensures that there will never be packet loss in the communication.
+ 
