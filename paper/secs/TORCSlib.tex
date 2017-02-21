@@ -9,7 +9,7 @@ We now explain the functionality provided by our library, and highlight the abil
 To interface with \ourLib, a user must implement a controller that will process the \texttt{CarState}, which contains all the data available from the sensors.
 The controller should then output a \texttt{DriveState}, which contains all the data for controlling the vehicle.
 This transformation is succinctly described as the now familiar \textit{signal function}.
-The core functionality of \ourLib is captured in the function \texttt{startDriver}, which will launch a controller in the simulator.
+The core functionality of \ourLib is captured in the function \texttt{startDriver}, which launches a controller in the simulator.
 This function automatically connects a \texttt{Driver} to TORCS, which results in continuous \texttt{IO()} actions, the output type of this function.
 
 \vspace{0.2em}
@@ -21,7 +21,7 @@ This function automatically connects a \texttt{Driver} to TORCS, which results i
 
 \noindent The sensor and output data structures contain all the typical data available in an autonomously controlled vehicle.
 \texttt{CarState} includes fields like \texttt{rpm} to monitor the engine, or \texttt{track} to simulate an array of LiDAR sensors oriented to the front of the vehicle.
-\texttt{DriveState} includes fields like \texttt{accel} to control gas pedal, or \texttt{steering} to control the angle of the steering wheel.
+\texttt{DriveState} includes fields like \texttt{accel} to control the gas pedal, or \texttt{steering} to control the angle of the steering wheel.
 A full description of the interface is available in the Simulated Car Racing Competition Manual~\cite{SCRCManual}. 
 
 \subsection{Case Study : Driving}
@@ -33,11 +33,11 @@ The controller uses \texttt{ArrowLoop} to keep track of the current gear of the 
 Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
 In general, the \texttt{ArrowLoop} can be used to maintain any state that may be of interest in a future processing step.
 Additionally, notice all of the data manipulation functions are pure, and lifted via the predefined function~\texttt{arr}.
-One major advantage of FRP is this separation of dependency flow and data level manipulation. 
 
+One major advantage of FRP is this separation of dependency flow and data level manipulation. 
 This abstraction makes it possible to easily reason about each of the components without worrying about confounding factors from the other.
 For example, if a programmer wants to verify that the steering control is correct, it is semantically guaranteed that the only function that must be checked is \texttt{steering}.
-Because of Haskell's purity, this is the only place where the steering value may be changed. This significantly reducing the complexity of verification or bug tracking in case of an error.
+Because of Haskell's purity, this is the only place where the steering value is changed. This significantly reduces the complexity of verification or bug tracking in case of an error.
 
 \begin{lstlisting}[float,floatplacement=TR,caption=A complete basic controller in Yampa, label=lst:driver]
 {-# LANGUAGE Arrows, MultiWayIf, RecordWildCards #-}
@@ -114,7 +114,7 @@ However, users are free to implement and simulate unreliable communications, or 
 
 TORCS uses a specialized physics engine for vehicle simulations, that includes levels of detail as fine grained as tire temperatures effect on traction. 
 When TORCS is used in the Simulated Car Racing Championship competition~\cite{SCRC}, each car is controlled via a socket that sends the sensor data from the vehicle and receives and processes the driving commands.
-So too, \ourLib communicates over these sockets to control a vehicles inside the TORCS simulations.
+So too, \ourLib communicates over these sockets to control vehicles inside the TORCS simulations.
 
 In addition to the core controller functionality, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communication.
 The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.

@@ -28,18 +28,18 @@ malformed state that can cause unexpected behavior.
 
 While mathematical models of embedded and cyberphysical systems often
 rely on functional notions such as stream-processing
-functions~\cite{DBLP:series/mcs/BroyS01,DBLP:conf/csdm/Broy12}, the
+functions~\cite{series/mcs/BroyS01,conf/csdm/Broy12}, the
 application of functional programming in the practical development of
 such systems has, so far, been limited. One of the most advanced
 programming language in this direction is Ivory, which was used in the
-development autonomous vehicles~\cite{pike2014}.  Ivory is a
+development of autonomous vehicles~\cite{pike2014}.  Ivory is a
 restricted version of the C programming language, embedded in Haskell.
 It provides access to the low level operations necessary for embedded
 system programming, but still enforces good programming practice, such
 as disallowing pointer arithmetic, with a rich type system.
 
 Ivory does not, however, have an explicit notion of time.
-It cannot then deal directly with the integration of 
+It cannot deal directly with the integration of 
 continuous and discrete time, which is fundamental for the
 development of a cyberphysical system. For example,
 in a car, continuous signals, such as the velocity or acceleration,
