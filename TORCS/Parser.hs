@@ -23,7 +23,7 @@ toByteString DriveState{..} = B.pack $
   "(focus "++(show focus)++")"++
   "(accel "++(show accel)++")"++
   "(meta " ++(show meta)++")"++
-  "(break "++(show break)++")"++
+  "(brake "++(show brakes)++")"++
   "(steer "++(show steer)++")"
 
 -- Again, do not include communications when decoding from server
@@ -36,15 +36,17 @@ fromByteString s = let
   fieldMap = M.fromList ps
   getField' s =  B.filter (/=' ') $ M.findWithDefault "" s fieldMap
   getField s = readAsDouble $ getField' s
+  getList s = map readAsDouble $ tail $ B.split ' ' $ M.findWithDefault "" s fieldMap
  in
   defaultCarState 
-     {angle = trace (B.unpack $ M.findWithDefault "" "track" fieldMap) getField "angle", 
+     {angle = getField "angle", 
       speedX = getField "speedX", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
       gear' = floor $ getField "gear",
       fuel = getField "fuel", 
       trackPos = getField "trackPos",
+      track = getList "track",
       damage = getField "damage"}
 
 -- TODO someone has to have a better way of doing this

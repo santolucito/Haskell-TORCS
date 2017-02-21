@@ -24,7 +24,7 @@ data DriveState = DriveState {
   ,focus     :: [Int]
   ,accel     :: Double
   ,meta      :: Double
-  ,break     :: Double
+  ,brakes     :: Double
   ,steer     :: Double
   ,broadcast :: Message
 } deriving (Show)
@@ -37,7 +37,7 @@ defaultDriveState = DriveState {
  ,focus = [-90, -45, 0, 45, 90]
  ,accel = 1
  ,meta = 0
- ,break = 1
+ ,brakes = 0
  ,steer = 0
  ,broadcast = ""}
 
