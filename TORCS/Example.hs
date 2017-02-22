@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RecordWildCards #-}
-module TORCS.Example (soloDrive) where
+module TORCS.Example where
 
 import FRP.Yampa
 
