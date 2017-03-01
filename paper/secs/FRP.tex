@@ -6,7 +6,7 @@ This imperative approach is well suited for rapid prototyping of small systems.
 However, tracing behaviors over time quickly becomes unmanageably complex for larger systems.
 
 Functional Reactive Programming instead introduces a concrete abstraction of time that allows the programmer to safely manipulate time-varying values. 
-The key abstraction is given by a \textit{signal}, providing the programmer with simple type interface:
+The key abstraction is given by a \textit{signal}, providing the programmer with a simple type interface:
 
 \begin{lstlisting}
   type Signal a = Time -> a
@@ -21,7 +21,7 @@ To better understand how our library works, we now introduce the basic concepts 
 There are many types of FRP based on different abstractions from type theory.
 Expressive abstractions, such as monads, allow for complex manipulation of signal flows~\cite{van2014monadic}. 
 However, for most applications they are far too expressive.
-We instead focus on a FRP library, Yampa, which uses the arrow abstraction, or so called Arrowized FRP~\cite{hudak2003arrows}.
+We instead focus on an FRP library, Yampa, which uses the arrow abstraction, or so called Arrowized FRP~\cite{hudak2003arrows}.
 Arrows generally run faster and with little need for manual optimization~\cite{yallop2016causal}, but are fundamentally less expressive than a monadic FRP~\cite{lindley2011idioms}.
 This more restrictive language is in fact a benefit, as it makes it harder for the programmer to introduce errors.
 As we will see in the sequel, Yampa is still powerful enough to write complex controllers to drive an autonomous vehicle, or even to communicate with other vehicles.
@@ -34,7 +34,7 @@ This is a transformer from one signal to another.
   type SF a b = Signal a -> Signal b
 \end{lstlisting}
 
-\noindent Using the previous signals, imagine a type for a steering function, which operates based on a video stream as
+\noindent Using the previous signals, imagine a type for a steering function, which operates based on a video stream, such as
 
 \begin{lstlisting}
   turn :: SF Image Steer
@@ -61,7 +61,7 @@ In Listing~\ref{lst:arrows}, this \texttt{avoid} function is lifted to the signa
   arr :: (a -> b) -> SF a b
 \end{lstlisting}
 %
-The function \texttt{turn} already is on the signal level (has a SF type). Hence, we do not need to lift it.
+The function \texttt{turn} is already on the signal level (has an SF type). Hence, we do not need to lift it.
 
 \begin{lstlisting}[float,floatplacement=h!,caption=Basic Arrowized FRP syntax,label=lst:arrows]
 myDriver :: SF Image Steer

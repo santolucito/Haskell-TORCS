@@ -28,7 +28,7 @@ A full description of the interface is available in the Simulated Car Racing Com
 
 As a demonstration of the \ourLib library in use, we implemented a simple controller, shown in Listing~\ref{lst:driver}. 
 The code is complete and immediately executable as-is together with an installation of TORCS.
-Our controller successfully navigates, with some speed and finesse, a vehicle in track, as shown in Fig.~\ref{fig:race} along with a video demonstration\footnote{\url{http://www.marksantolucito.com/torcsdemo}}.
+Our controller successfully navigates, with some speed and finesse, a vehicle on track, as shown in Fig.~\ref{fig:race} along with a video demonstration\footnote{\url{http://www.marksantolucito.com/torcsdemo}}.
 The controller uses \texttt{ArrowLoop} to keep track of the current gear of the car.
 Although the gear is available as sensor data, it is illustrative to keep track locally of this state.
 In general, the \texttt{ArrowLoop} can be used to maintain any state that may be of interest in a future processing step.
@@ -79,14 +79,14 @@ gas (speed, steer) =
 
 \subsection{Case Study : Communication for Platoons}
 
-Thanks to functional language's exceptional support for parallelism, controlling multiple vehicles in a multi-threaded environment is exceedingly simple. 
+Thanks to functional languages' exceptional support for parallelism, controlling multiple vehicles in a multi-threaded environment is exceedingly simple. 
 In our library API, the user simply uses \texttt{startDrivers} rather than \texttt{startDriver}, and passes a list of \texttt{Driver} signal functions ``driving'' together.
 In this way, we easily let various implementations race against each other, or build a vehicle platooning controller.
 In the latter, the user can even extend the implementation to simulate communication between the vehicles.
 
 Our library already provides a simple interface for simulating communication between vehicles.
-In order to broadcast a message to the other vehicles in the simulation, the controller simply broadcasts a message via the \texttt{broadcast} field of \texttt{DriveState}.
-That message is then broadcast to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
+In order to broadcast a message to the other vehicles in the simulation, the controller simply writes a message to the \texttt{broadcast} field of \texttt{DriveState}.
+That message is then sent to all other vehicles as soon as possible, and received in the \texttt{communication} field of the input \texttt{CarState}.
 
 A fragment of communication code is given in Listing~\ref{lst:platoon}, to pass messages between vehicles. 
 In this fragment, a vehicle checks if a collision is imminent, and can request for the other cars in the platoon to go faster and move out of the way.
@@ -117,7 +117,7 @@ When TORCS is used in the Simulated Car Racing Championship competition~\cite{SC
 So too, \ourLib communicates over these sockets to control vehicles inside the TORCS simulations.
 
 In addition to the core controller functionality, we have also augmented \ourLib with the ability to test vehicle platooning algorithms that utilize cross-vehicle communication.
-The communication channels are realized via a hash map, using the \texttt{Data.Map} interface, from vehicle identifiers to messages.
+The communication channels are realized via a hash map, using the \texttt{Data.Hashmap} interface, from vehicle identifiers to messages.
 Each vehicle is given write permissions to their unique channel, where all other vehicles have read-only permissions.
 The access is mutually exclusive, which is ensured by Haskell's \texttt{MVar} implementation, a threadsafe shared memory library.
 This ensures that there will never be packet loss in the communication.
