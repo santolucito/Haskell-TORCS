@@ -1,4 +1,4 @@
-\section{Functional Reactive Programming}
+\section{FRP}
 
 The most common solution for the construction of reactive systems in an imperative setting are call-back frameworks, embedded into a loop.
 The call-backs are either used to query the state of variables, or to change them.
@@ -12,7 +12,6 @@ The key abstraction is given by a \textit{signal}, providing the programmer with
   type Signal a = Time -> a
 \end{lstlisting}
 
-\noindent Intuitively, a signal is a function that relates time to a value.
 For example, the type \texttt{Signal Image} represents a video, while \texttt{Signal Steer} captures a steering wheel operated over time.
 To better understand how our library works, we now introduce the basic concepts and terminology from FRP.
 

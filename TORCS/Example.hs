@@ -18,7 +18,7 @@ myDriver = proc e -> do
     CarState{..} <- arr getE -< e
     rec
        gear <- arr shifting -< (rpm,gear')
-       steer <- arr (steering 0.1) -< (track,angle,trackPos)
+       steer <- arr (steering 0) -< (track,angle,trackPos)
        (a,b) <- arr (gas 290) -< (track,speedX,steer,trackPos)
     returnA -< defaultDriveState {accel = a, gear = gear, steer = steer, brakes = b}
 
@@ -49,7 +49,7 @@ slice begin end = take (end - (begin-1)) . drop (begin-1)
 gas :: Double -> ([Double],Double,Double,Double) -> (Double,Double)
 gas targetSpeed (track,speed,steer,trackPos) = let
     fd = frontDist track
-    approachingTurn = fd < 150
+    approachingTurn = fd < 100
     braking = approachingTurn && speed > (max 30 (260-(2200/fd)))
     turning = frontDist track < 70 && any (>100) track
     offtrack = any (==(-1)) track && (abs trackPos) > 2 
