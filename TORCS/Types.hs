@@ -23,8 +23,8 @@ data DriveState = DriveState {
   ,clutch    :: Double
   ,focus     :: [Int]
   ,accel     :: Double
-  ,meta      :: Double
-  ,brakes     :: Double
+  ,meta      :: Int --0 or (1 restart race)
+  ,brakes    :: Double
   ,steer     :: Double
   ,broadcast :: Message
 } deriving (Show)
@@ -32,13 +32,13 @@ data DriveState = DriveState {
 type Message = String
 
 defaultDriveState = DriveState {
-  gear = 1
+  gear   = 1
  ,clutch = 0
- ,focus = [-90, -45, 0, 45, 90]
- ,accel = 1
- ,meta = 0
+ ,focus  = [-90, -45, 0, 45, 90]
+ ,accel  = 1
+ ,meta   = 0
  ,brakes = 0
- ,steer = 0
+ ,steer  = 0
  ,broadcast = ""}
 
 
@@ -70,24 +70,24 @@ data CarState = CarState {
 type Communications = M.Map Int (Maybe String)
 
 defaultCarState = CarState {
-   z   = 0
-  ,angle  = 0
-  ,gear'  = 1
-  ,trackPos = 0
-  ,speedY = 0
+   z         = 0
+  ,angle     = 0
+  ,gear'     = 1
+  ,trackPos  = 0
+  ,speedY    = 0
   ,distRaced = 0
-  ,speedZ = 0
-  ,damage = 0
+  ,speedZ    = 0
+  ,damage    = 0
   ,wheelSpinVel = [0,0,0,0] -- length 4
-  ,focus = [0]
-  ,track = replicate 19 0
+  ,focus     = [0]
+  ,track     = replicate 19 0
   ,curLapTime = 0
-  ,speedX = 0
-  ,racePos = 1
-  ,fuel = 100
+  ,speedX    = 0
+  ,racePos   = 1
+  ,fuel      = 100
   ,distFromStart = 0
   ,opponents = [0]
-  ,rpm   = 0
+  ,rpm       = 0
   ,lastLapTime = 0
   ,communications = M.empty
 }

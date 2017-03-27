@@ -38,11 +38,14 @@ fromByteString s = let
   getField s = readAsDouble $ getField' s
   getList s = map readAsDouble $ tail $ B.split ' ' $ M.findWithDefault "" s fieldMap
  in
-  defaultCarState 
+  if (s=="***restart***\NUL" || s=="")
+  then defaultCarState 
+  else defaultCarState 
      {angle = getField "angle", 
       speedX = getField "speedX", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
+      lastLapTime = getField "lastLapTime", 
       gear' = floor $ getField "gear",
       fuel = getField "fuel", 
       trackPos = getField "trackPos",

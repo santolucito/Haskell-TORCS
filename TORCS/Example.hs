@@ -17,10 +17,15 @@ myDriver :: Driver
 myDriver = proc e -> do
     CarState{..} <- arr getE -< e
     rec
-       gear <- arr shifting -< (rpm,gear')
+       gear  <- arr shifting -< (rpm,gear')
        steer <- arr (steering 0) -< (track,angle,trackPos)
        (a,b) <- arr (gas 290) -< (track,speedX,steer,trackPos)
-    returnA -< defaultDriveState {accel = a, gear = gear, steer = steer, brakes = b}
+       m     <- arr restarting -< (lastLapTime)
+    returnA -< defaultDriveState {accel = a, gear = gear, steer = steer, brakes = b, meta = m}
+
+restarting :: Double -> Int
+restarting t = 
+  if abs t > 0 then traceShow t 1 else 0
 
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
@@ -61,11 +66,12 @@ gas targetSpeed (track,speed,steer,trackPos) = let
        | approachingTurn -> "approaching turn"++(show $ front3 track)
        | otherwise -> "straightaway"
   in 
-    trace out $ if 
+    --trace out $ if 
+    if 
       | offtrack        -> (0.5,0)
       | braking         -> (0,1)
       | turning         -> (1,0)
-      | approachingTurn -> if speed > 120 then traceMe (0,(150-fd)/150) else (0.4,0)
+      | approachingTurn -> if speed > 120 then (0,(150-fd)/150) else (0.4,0)
       | otherwise       -> (1,0)
       
   

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module TORCS.Connect (startDriver,startDrivers) where
 
 import Network.Socket hiding (sendTo,recvFrom)
@@ -18,13 +19,16 @@ import Data.ByteString.Char8 (pack)
 import Data.Tuple
 import Data.Maybe
 
+import System.Exit 
+
 import FRP.Yampa 
 
 import TORCS.Types
 import TORCS.Parser
 
 
--- | We want to be able to simulate platooning
+-- | To simulate platooning
+--   we create comm channels between all vehicles that we start
 startDrivers  :: [Driver] -> IO()
 startDrivers ds = do
   mvars' <- mapM (\x->newEmptyMVar) ds :: IO [MVar String]
@@ -41,17 +45,17 @@ startDriver d = startDriverWithPort M.empty d 0 "3001"
 
 startDriverWithPort :: M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO ()
 startDriverWithPort mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
-          where
-            connectMe = do
-              threadDelay delay
-              (serveraddr:_) <- getAddrInfo
-                                  (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
-                                  Nothing (Just port)
-              sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
-              connect sock (addrAddress serveraddr)
-              let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
-              _ <- sendTo sock mysteryString (addrAddress serveraddr)
-              return sock
+  where
+    connectMe = do
+      threadDelay delay
+      (serveraddr:_) <- getAddrInfo
+                          (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
+                          Nothing (Just port)
+      sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
+      connect sock (addrAddress serveraddr)
+      let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
+      _ <- sendTo sock mysteryString (addrAddress serveraddr)
+      return sock
 
 --the id (port number) is used to choose this car's writing mvar
 yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO ()
@@ -86,7 +90,7 @@ mySwapMVar m v = do
 sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> Bool -> IO (DTime, Maybe (Event CarState))
 sense timeRef conn chans _ = do
   cur <- getCurrentTime
-  (msg,d) <- recvFrom conn 1024
+  (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> exitSuccess)
   ms <- mapM tryReadMVar chans :: IO (M.Map Int (Maybe String))
   dt <- timediff timeRef cur
   let x = (fromByteString msg){communications = ms}
