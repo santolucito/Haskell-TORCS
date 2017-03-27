@@ -38,7 +38,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{acmart}
-[2016/12/03 v1.25 Typesetting articles for Association of
+[2017/01/07 v1.28 Typesetting articles for Association of
 Computing Machinery]
 \def\@classname{acmart}
 \RequirePackage{xkeyval}
@@ -265,7 +265,9 @@ Computing Machinery]
     numbers,sort&compress,%
     open={[},close={]},citesep={,},%
     notesep={, }}}
+\if@ACM@natbib
 \citestyle{acmnumeric}
+\fi
 \def\@startsection#1#2#3#4#5#6{%
   \if@noskipsec \leavevmode \fi
   \par
@@ -353,7 +355,13 @@ Computing Machinery]
   \@xsect{#3}}
 \let\@footnotemark@nolink\@footnotemark
 \let\@footnotetext@nolink\@footnotetext
-\RequirePackage[bookmarksnumbered]{hyperref}
+\RequirePackage[bookmarksnumbered,unicode]{hyperref}
+\pdfstringdefDisableCommands{%
+  \def\unskip{}
+  \def\textbullet{- }
+  \def\textrightarrow{ -> }
+  \def\footnotemark{}
+}
 \urlstyle{rm}
 \ifcase\ACM@format@nr
 \relax % manuscript
@@ -385,7 +393,6 @@ Computing Machinery]
   \let\citeyearNP\citeyear
   \let\citeyear\citeyearpar
   \let\citeNP\citealt
-  \def\shortcite#1{\citeyear{#1}}
   \DeclareRobustCommand\citeA
      {\begingroup\NAT@swafalse
        \let\NAT@ctype\@ne\NAT@partrue\NAT@fullfalse\NAT@open\NAT@citetp}%
@@ -393,6 +400,7 @@ Computing Machinery]
 \else
   \providecommand\citename[1]{#1}
 \fi
+\def\shortcite#1{\ifNAT@numbers\cite{#1}\else\citeyear{#1}\fi}
 \def\bibliographystyle#1{%
   \ifx\@begindocumenthook\@undefined\else
     \expandafter\AtBeginDocument
@@ -538,8 +546,6 @@ Computing Machinery]
 \RequirePackage[tt=false]{libertine}
 \RequirePackage[varqu]{zi4}
 \RequirePackage[libertine]{newtxmath}
-\else
-\RequirePackage{textcomp}
 \fi
 \if@ACM@sigchiamode
   \renewcommand{\familydefault}{\sfdefault}
@@ -1020,12 +1026,12 @@ Computing Machinery]
 \long\def\@saveabstract#1{\long\gdef\@abstract{#1}}
 \@saveabstract{}
 \long\def\@lempty{}
-\define@boolkey+{@ACM@topmatter@}[@ACM@]{printcss}[true]{%
-  \if@ACM@printcss
-    \ClassInfo{\@classname}{Printing CSS}%
+\define@boolkey+{@ACM@topmatter@}[@ACM@]{printccs}[true]{%
+  \if@ACM@printccs
+    \ClassInfo{\@classname}{Printing CCS}%
   \else
-    \ClassInfo{\@classname}{Suppressing CSS}%
-  \fi}{\ClassError{\@classname}{printcss must be true or false}}
+    \ClassInfo{\@classname}{Suppressing CCS}%
+  \fi}{\ClassError{\@classname}{printccs must be true or false}}
 \define@boolkey+{@ACM@topmatter@}[@ACM@]{printacmref}[true]{%
   \if@ACM@printacmref
     \ClassInfo{\@classname}{Printing bibformat}%
@@ -1039,7 +1045,7 @@ Computing Machinery]
     \ClassInfo{\@classname}{Suppressing folios}%
   \fi}{\ClassError{\@classname}{printfolios must be true or false}}
 \def\settopmatter#1{\setkeys{@ACM@topmatter@}{#1}}
-\settopmatter{printcss=true, printacmref=true}
+\settopmatter{printccs=true, printacmref=true}
 \if@ACM@manuscript
   \settopmatter{printfolios=true}
 \else
@@ -1073,9 +1079,10 @@ Computing Machinery]
 \let\@concepts\@empty
 \newcommand\ccsdesc[2][100]{%
   \ccsdesc@parse#1~#2~}
+\RequirePackage{textcomp}
 \def\ccsdesc@parse#1~#2~#3~{%
   \expandafter\ifx\csname CCS@#2\endcsname\relax
-    \expandafter\gdef\csname CCS@#2\endcsname{\textbullet\textbf{#2} $\to$ }%
+    \expandafter\gdef\csname CCS@#2\endcsname{\textbullet\textbf{#2} \textrightarrow }%
   \g@addto@macro{\@concepts}{\csname CCS@#2\endcsname}\fi
   \expandafter\g@addto@macro\expandafter{\csname CCS@#2\endcsname}{%
     \ifnum#1>499\textbf{#3; }\else
@@ -1346,7 +1353,7 @@ Computing Machinery]
   \endgroup
   \setcounter{footnote}{0}%
   \@mkabstract
-  \if@ACM@printcss
+  \if@ACM@printccs
     \ifx\@concepts\@empty\else\bgroup
       {\@specialsection{CCS Concepts}%
          \@concepts\par}\egroup
