@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RecordWildCards #-}
-module TORCS.MultiExample where
+module TORCS.Examples.MultiExample where
 
 import FRP.Yampa
 

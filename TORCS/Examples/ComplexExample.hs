@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RecordWildCards #-}
-module TORCS.Example where
+module TORCS.Examples.ComplexExample where
 
 import FRP.Yampa
 
@@ -27,8 +27,6 @@ myDriver maxSpeed = proc e -> do
        (a,b) <- arr (gas maxSpeed) -< (track,speedX,steer,trackPos)
        m     <- arr (restarting maxSpeed) -< (lastLapTime,curLapTime)
     returnA -< defaultDriveState {accel = a, gear = gear, steer = steer, brakes = b, meta = m}
-
-outputV x = traceShow x x
 
 restarting :: Double -> (Double,Double) -> Int
 restarting s (lapT,ct) = 
