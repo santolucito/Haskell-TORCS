@@ -23,7 +23,7 @@ data DriveState = DriveState {
   ,clutch    :: Double
   ,focus     :: [Int]
   ,accel     :: Double
-  ,meta      :: Int --0 or (1 restart race)
+  ,meta      :: Int --0 or (1 restart race and end yampa loop)
   ,brakes    :: Double
   ,steer     :: Double
   ,broadcast :: Message

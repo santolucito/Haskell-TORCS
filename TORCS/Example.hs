@@ -10,22 +10,29 @@ import TORCS.Connect
 
 import Debug.Trace
 
-soloDrive :: IO ()
-soloDrive = startDriver myDriver
+import Control.Concurrent
 
-myDriver :: Driver
-myDriver = proc e -> do
+soloDrive :: IO ()
+soloDrive = do 
+  let ds = map myDriver [130,135..300]
+  mapM (\d-> threadDelay 1000000 >> startDriver d) ds
+  return ()
+
+myDriver :: Double -> Driver
+myDriver maxSpeed = proc e -> do
     CarState{..} <- arr getE -< e
     rec
        gear  <- arr shifting -< (rpm,gear')
        steer <- arr (steering 0) -< (track,angle,trackPos)
-       (a,b) <- arr (gas 290) -< (track,speedX,steer,trackPos)
-       m     <- arr restarting -< (lastLapTime)
+       (a,b) <- arr (gas maxSpeed) -< (track,speedX,steer,trackPos)
+       m     <- arr (restarting maxSpeed) -< (lastLapTime,curLapTime)
     returnA -< defaultDriveState {accel = a, gear = gear, steer = steer, brakes = b, meta = m}
 
-restarting :: Double -> Int
-restarting t = 
-  if abs t > 0 then traceShow t 1 else 0
+outputV x = traceShow x x
+
+restarting :: Double -> (Double,Double) -> Int
+restarting s (lapT,ct) = 
+  if trace (show lapT++" "++show ct) $ lapT > 0 || ct > 200 then trace (show lapT++" - "++show s) 0 else 0
 
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
@@ -55,7 +62,7 @@ gas :: Double -> ([Double],Double,Double,Double) -> (Double,Double)
 gas targetSpeed (track,speed,steer,trackPos) = let
     fd = frontDist track
     approachingTurn = fd < 100
-    braking = approachingTurn && speed > (max 30 (260-(2200/fd)))
+    braking = approachingTurn && speed > (max 30 (targetSpeed-(2200/fd)))
     turning = frontDist track < 70 && any (>100) track
     offtrack = any (==(-1)) track && (abs trackPos) > 2 
     out = 

@@ -75,10 +75,12 @@ yampaRunner myDriver allChannels id conn = do
 -- second, broadcast the message to the other threads
 action :: Socket -> SockAddr -> Maybe (MVar String) -> Bool -> DriveState -> IO Bool
 action conn d myBroadcastChan _ msg = do
-  _ <- sendTo conn (toByteString msg) d 
-  oldVal <- maybe (return Nothing) tryReadMVar  myBroadcastChan
+  bytesSent <- sendTo conn (toByteString msg) d 
+  oldVal <- maybe (return Nothing) tryReadMVar myBroadcastChan
   _ <- maybe (return False) (\x -> if oldVal == (Just $ broadcast msg) then return False else mySwapMVar x (broadcast msg)) myBroadcastChan
-  return False
+  --if we just sent a restart signal, end the reactimation (return True)
+  --otherwise, continue (return False)
+  return $ if meta msg == 1 then True else False
 
 mySwapMVar :: MVar a -> a -> IO Bool
 mySwapMVar m v = do
@@ -90,7 +92,7 @@ mySwapMVar m v = do
 sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> Bool -> IO (DTime, Maybe (Event CarState))
 sense timeRef conn chans _ = do
   cur <- getCurrentTime
-  (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> exitSuccess)
+  (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> return ("",SockAddrUnix "")) --if nothing to sense from, get default value
   ms <- mapM tryReadMVar chans :: IO (M.Map Int (Maybe String))
   dt <- timediff timeRef cur
   let x = (fromByteString msg){communications = ms}
