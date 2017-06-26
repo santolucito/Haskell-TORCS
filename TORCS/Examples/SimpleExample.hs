@@ -10,14 +10,14 @@ import TORCS.Connect
 import Control.Concurrent
 
 simpleDrive :: IO ()
-simpleDrive = startDriver myDriver
+simpleDrive = startDriver $ myDriver 100
 
-myDriver :: Driver
-myDriver = proc e -> do
+myDriver :: Double -> Driver
+myDriver targetSpeed = proc e -> do
     CarState{..} <- arr getE -< e
     g <- arr shifting -< speedX
     s <- arr steering -< (angle,trackPos)
-    a <- arr (gas 100) -< (speedX,s)
+    a <- arr (gas targetSpeed) -< (speedX,s)
     returnA -< defaultDriveState {accel = a, gear = g, steer = s}
 
 shifting :: Double -> Int

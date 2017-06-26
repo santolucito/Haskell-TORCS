@@ -14,7 +14,7 @@ import Control.Concurrent
 
 soloDrive :: IO ()
 soloDrive = do 
-  let ds = map myDriver [130,135..300]
+  let ds = map myDriver [230,235..300]
   mapM (\d-> threadDelay 1000000 >> startDriver d) ds
   return ()
 
@@ -30,8 +30,8 @@ myDriver maxSpeed = proc e -> do
 
 restarting :: Double -> (Double,Double) -> Int
 restarting s (lapT,ct) = 
-  if trace (show lapT++" "++show ct) $ lapT > 0 || ct > 200 then trace (show lapT++" - "++show s) 0 else 0
-
+  --if trace (show lapT++" "++show ct) $ lapT > 0 || ct > 200 then trace (show lapT++" - "++show s) 0 else 0
+  0
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
   | rpm > 7000 -> min 6 (g+1)
