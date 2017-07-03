@@ -11,6 +11,13 @@ Complete instructions here https://arxiv.org/abs/1304.1672
 
 on Ubunutu 16.04, you may need to comment out line 70 in src/modules/simu/simuv2/simu.cpp 
 
+## Usage
+
+See the examples folder for how to program a controller.
+
+You can load up the examples and run them with 'cabal repl' on the top directory. 
+This will load TORCS.hs, which loads a few examples that can be connected to TORCS.
+
 TODO
 
 - write controller for basic platoon

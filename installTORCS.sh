@@ -1,3 +1,5 @@
+#an untested script that is roughly models the install process for torcs and the patch on linux
+
 mkdir torcs
 cd torcs
 wget http://prdownloads.sourceforge.net/torcs/torcs-1.3.4.tar.bz2?download
