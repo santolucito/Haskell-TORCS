@@ -1,0 +1,17 @@
+\section{Case Study: TORCS}
+
+We use the Haskell bindings to TORCS to synthesize an FRP controller for a autonomous vehicle.
+Since our synthesis procedure requires implementations of the pure functions to be complete, we leave those details to machine learning.
+
+\subsection{Specifying a Driver}
+
+\subsection{Optimization}
+As a simpler case, we first provide rough implementations of the pure functions, leaving out only the critical values such as target speed and turning radius.
+We use stochastic gradient descent to find optmimal values (where the cost is the lap time) to be embedded in the pure functions.
+
+
+\subsection{Full Synthesis}
+In this section we demonstrate how to use a nueral network to generate the low level interpretation of the pure functions to machine learning.
+In this way, we still rely on the formalized program synthesis to give us a correct by construction framework for the driver.
+
+
