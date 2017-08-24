@@ -10,25 +10,22 @@ import TORCS.Connect
 import Control.Concurrent
 
 simpleDrive :: IO ()
-simpleDrive = startDriver $ myDriver 100
+simpleDrive = startDriver_ $ myDriver 100
 
 myDriver :: Double -> Driver
 myDriver targetSpeed = proc e -> do
     CarState{..} <- arr getE -< e
-    g <- arr shifting -< speedX
+    g <- arr shifting -< (rpm,gear')
     s <- arr steering -< (angle,trackPos)
     a <- arr (gas targetSpeed) -< (speedX,s)
     returnA -< defaultDriveState {accel = a, gear = g, steer = s}
 
-shifting :: Double -> Int
-shifting s = if 
-  | s > 170 -> 6
-  | s > 140 -> 5
-  | s > 110 -> 4
-  | s > 80 -> 3
-  | s > 50 -> 2
-  | s <= 50 -> 1
- 
+shifting :: (Double,Int) -> Int
+shifting (rpm,g) = if 
+  | rpm > 7000 -> min 6 (g+1)
+  | rpm < 3000 -> max 1 (g-1)
+  | otherwise  -> g
+
 steering :: (Double,Double) -> Double
 steering (spd,trackPos) = let
   turns = spd*14 / pi

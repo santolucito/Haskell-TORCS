@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module TORCS.Connect (startDriver,startDrivers) where
+{-# LANGUAGE MultiWayIf #-}
+module TORCS.Connect (startDriver_,startDriver,startDrivers) where
 
 import Network.Socket hiding (sendTo,recvFrom)
 import Network.Socket.ByteString (sendTo,recvFrom)
@@ -37,13 +38,14 @@ startDrivers ds = do
     ps = map show [3001..]
     ts = map (*1000000) [0,1..]
     cs = zip (zip ds ts) ps
-  P.mapM ((uncurry. uncurry) (startDriverWithPort mvars)) cs 
+  P.mapM_ ((uncurry. uncurry) (startDriverWithPort mvars)) cs 
   return ()
 
 -- if starting a single driver, we dont need any communication channels (mvar)
-startDriver d = startDriverWithPort M.empty d 0 "3001"
+startDriver d = startDriverWithPort M.empty d 0 "3001" 
+startDriver_ d = startDriver d >> return ()
 
-startDriverWithPort :: M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO ()
+startDriverWithPort :: M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
 startDriverWithPort mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
   where
     connectMe = do
@@ -58,29 +60,38 @@ startDriverWithPort mvars myDriver delay port = withSocketsDo $ bracket connectM
       return sock
 
 --the id (port number) is used to choose this car's writing mvar
-yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO ()
+yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO (CarState, DriveState)
 yampaRunner myDriver allChannels id conn = do
   (msg,addr) <- recvFrom conn 1024
   t <- getCurrentTime
   timeRef <- newIORef t
+  driveRef <- newIORef defaultDriveState
+  carRef <- newIORef defaultCarState
   let myChannel = read id :: Int
   reactimate
     (return NoEvent)
-    (sense timeRef conn allChannels)
-    (action conn addr (M.lookup myChannel allChannels))
+    (sense timeRef conn allChannels carRef)
+    (action conn addr (M.lookup myChannel allChannels) driveRef)
     myDriver
+  --TODO clean this syntax
+  d <- readIORef driveRef
+  c <- readIORef carRef
+  return (c,d)
 
 -- action will do two things separately
 -- first, send the drive instructions
 -- second, broadcast the message to the other threads
-action :: Socket -> SockAddr -> Maybe (MVar String) -> Bool -> DriveState -> IO Bool
-action conn d myBroadcastChan _ msg = do
+action :: Socket -> SockAddr -> Maybe (MVar String) -> IORef DriveState ->
+          Bool -> DriveState -> IO Bool
+action conn d myBroadcastChan outRef _ msg = do
   bytesSent <- sendTo conn (toByteString msg) d 
   oldVal <- maybe (return Nothing) tryReadMVar myBroadcastChan
   _ <- maybe (return False) (\x -> if oldVal == (Just $ broadcast msg) then return False else mySwapMVar x (broadcast msg)) myBroadcastChan
   --if we just sent a restart signal, end the reactimation (return True)
   --otherwise, continue (return False)
-  return $ if meta msg == 1 then True else False
+  if (meta msg == 1)
+  then writeIORef outRef msg >> return True 
+  else return False
 
 mySwapMVar :: MVar a -> a -> IO Bool
 mySwapMVar m v = do
@@ -88,16 +99,26 @@ mySwapMVar m v = do
   tryPutMVar m v
   
 -- sensing will try to read from all the mvars, and add this info to CarState
--- this will not write anything
-sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> Bool -> IO (DTime, Maybe (Event CarState))
-sense timeRef conn chans _ = do
+-- this only writes to the lapTimes part of CarState (not native to TORCS)
+sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> IORef CarState -> Bool -> IO (DTime, Maybe (Event CarState))
+sense timeRef conn chans carRef _ = do
   cur <- getCurrentTime
   (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> return ("",SockAddrUnix "")) --if nothing to sense from, get default value
   ms <- mapM tryReadMVar chans :: IO (M.Map Int (Maybe String))
   dt <- timediff timeRef cur
-  let x = (fromByteString msg){communications = ms}
-  --print dt
-  return (dt, Just $ return x) --TODO do i need the Event wrapper?
+  let rawCarState = (fromByteString msg){communications = ms}
+  oldCarState <- readIORef carRef
+  let carState = rawCarState{lapTimes = countLaps (lapTimes oldCarState, lastLapTime rawCarState)}
+  --TODO this should not need to write everytime - find a way to detect when we are restarting and only save the carState then 
+  writeIORef carRef carState
+  return (dt, Just $ return carState) --TODO do i need the Event wrapper?
+
+--A small wrapper to keep track of how long each lap took
+countLaps :: ([Double],Double) -> [Double]
+countLaps (lapTs,lastT) = if 
+  | lastT == 0 -> []
+  | lastT>0 && (length lapTs == 0 || lastT /= head lapTs) -> lastT : lapTs
+  | otherwise -> lapTs
 
 timediff ::  IORef UTCTime -> UTCTime -> IO DTime
 timediff ref cur = do

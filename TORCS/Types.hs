@@ -64,6 +64,7 @@ data CarState = CarState {
   ,opponents      :: [Double] 
   ,rpm            :: Double
   ,lastLapTime    :: Double
+  ,lapTimes       :: [Double]
   ,communications :: Communications
 } deriving (Show)
 
@@ -89,5 +90,6 @@ defaultCarState = CarState {
   ,opponents = [0]
   ,rpm       = 0
   ,lastLapTime = 0
+  ,lapTimes  = []
   ,communications = M.empty
 }
