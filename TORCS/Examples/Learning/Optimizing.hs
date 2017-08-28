@@ -16,6 +16,9 @@ import Debug.Trace
 import System.Process
 import System.IO.Unsafe
 
+import System.Random.Shuffle
+import System.Random
+
 import Control.Lens
 
 optimize :: Thetas
@@ -24,6 +27,7 @@ optimize =
     0.1 0.001 
     (Thetas {_speed=160.0,_turning=14}) (Thetas {_speed=0,_turning=0}) evalDriver
 
+batchSize = 2
 allLenses = [speed, turning]
 
 -- | Use data type Theta for params to be passed to driver
@@ -34,11 +38,19 @@ multiVarGD goal learnRate t t_prev f =
     converged = (abs((_speed t)-(_speed t_prev)) <= goal)
     continueGD = multiVarGD goal learnRate updatedThetas t f
     -- NB use a fixed theta for takeStep, but update a seperate copy of theta in the fold
-    updatedThetas = foldr (takeStep learnRate t f) t allLenses
+    updatedThetas = foldr (takeStep learnRate t f) t (stochastic allLenses)
   in
     if not converged
     then continueGD
     else t
+
+stochastic :: [a] -> [a]
+stochastic xs =
+  take batchSize $ shuffle' xs (length xs) rand
+ where
+  --TODO get rid of unsafe here, pass in the gen from the top io level and there is no problem
+  rand = unsafePerformIO newStdGen
+
 
 -- TODO get rid of unsafe here? (actually its fine here, but would be a nice exercise to fix)
 takeStep :: Double -> Thetas -> (Thetas -> IO Double) -> _Lens -> Thetas -> Thetas
