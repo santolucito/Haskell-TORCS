@@ -1,0 +1,44 @@
+\section{Motivating Example}
+
+We take as a motivating example, the gearing controller component for an autonomous vehicle system.
+In a typical scenario, we might build a neural network to control the output of the gear box at every time step based on all relevant sensor data.
+We then have a neural network, $\fullNN$, processing inputs (acceleration, braking, speed, rpm, gear) to produce a new (gear) signal.
+
+We can imagine this as a mealy machine with a single state and a single transition, which is always active.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,on grid]
+  \node[state]   (q_0)                {$q_0$};
+  \path[->] (q_0) 
+		  edge [loop above]   node  [above,align=center]         {$\top,$\\$ \fullNN$} ();
+\end{tikzpicture}
+\caption{A mealy machine of a single monolithic neural network}
+\label{fig:full}
+\end{figure}
+
+Now assume we have some adversarial actor that takes control of the speed sensor.
+Since this network is processing the speed signal at every time step, we cannot have any guarantee of the effect a faulty speed sensor will have on our overall output.
+
+In contrast, imagine we build an automata of neural networks as below.
+Here, we have composed three networks; $\isAccel$ for a binary classifier that indicates whether the car is accelerating and the two multiclass classifiers, $\rpmGear$ and $\speedGear$, mapping their inputs to the target gear into which the car should shift (for example gears 1-5).
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,on grid]
+  \node[state]   (q_0)                {$q_0$};
+  \node[state] (q_1) [right=of q_0] {$q_1$};
+  \path[->] (q_0) 
+		  edge [loop left]   node  [above,align=center]         {$\neg \isAccel,$\\$ \varnothing$} ()
+		  edge [bend left=45] node [above,align=center] {$\isAccel,$\\$ \varnothing$} (q_1)
+            (q_1) 
+		  edge [loop right]   node [above right,xshift=-0.5cm,align=center]        {$\isAccel,$\\$ \speedGear$} ()
+		  edge [bend left=45] node [below,align=center] {$\neg \isAccel,$\\$ \rpmGear$} (q_0);
+\end{tikzpicture}
+\caption{A mealy machine of multiple composed neural networks}
+\label{fig:components}
+\end{figure}
+
+In Fig.~\ref{fig:components}, we clearly see that an attack on the speed sensor is guaranteed to only have an effect on the transition from state $q_0$ to state $q_1$.
+Because of this compartmentalization of vulnerability, safety tactics such as trying to detect anomalous values may be employed to greater effect.
+In the sequel, we will present a quantitative formalization of the vulnerability of the systems in both Fig.~\ref{fig:full} and Fig.~\ref{fig:components}.
