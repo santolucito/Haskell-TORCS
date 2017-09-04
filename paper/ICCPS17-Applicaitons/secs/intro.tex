@@ -6,12 +6,12 @@ Neural networks are used in building systems of autonomous vehicles, in both com
 
 \subsection{Legibility}
 
-As demonstrated in ~\cite{NNLegibility}, neural networks can be unreliable in the presence of small perturbations of the input.
+As demonstrated in~\cite{DBLP:journals/corr/SzegedyZSBEGF13}, neural networks can be unreliable in the presence of small perturbations of the input.
 As an example, with the manipulation of just a few pixels, a neural network can be fooled into thinking a stop sign is a speed limit sign.
 These perturbations can be the result of random noise, or adversarial actors who aim to disrupt the safe behavior of the system.
 
 In fact, in autonomous vehicles, further attacks are possible when the attacker has direct access to hardware.
-As demonstrated in ~\cite{brakeHack}, by non-intrusively attaching a small device in the wheel well of a car, the sensors that track the speed of the wheels can be completely controlled by an attacker.
+As demonstrated in~\cite{DBLP:journals/iacr/Shoukry0TS15}, by non-intrusively attaching a small device in the wheel well of a car, the sensors that track the speed of the wheels can be completely controlled by an attacker.
 Under unreliable sensor data, autonomous vehicles must continue to behave, as best as is possible, in a safe manner.
 However, when using monolithic controllers, such as top-level neural networks for driving control, safely handling anomalous input remains a challenge.
 
