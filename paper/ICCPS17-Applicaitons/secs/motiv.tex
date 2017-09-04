@@ -22,6 +22,9 @@ Since this network is processing the speed signal at every time step, we cannot 
 
 In contrast, imagine we build an automata of neural networks as below.
 Here, we have composed three networks; $\isAccel$ for a binary classifier that indicates whether the car is accelerating and the two multiclass classifiers, $\rpmGear$ and $\speedGear$, mapping their inputs to the target gear into which the car should shift (for example gears 1-5).
+The mealy machine says that when the car is not accelerating, we should not shift the gear.
+It also specifies that when we start to accelerate after a period of slowing down, we should set the gear based on the current speed.
+As the car continues to accelerate, the gear should be set based on the rpm of the engine.
 
 \begin{figure}[h!]
 \centering
@@ -30,10 +33,10 @@ Here, we have composed three networks; $\isAccel$ for a binary classifier that i
   \node[state] (q_1) [right=of q_0] {$q_1$};
   \path[->] (q_0) 
 		  edge [loop left]   node  [above,align=center]         {$\neg \isAccel,$\\$ \varnothing$} ()
-		  edge [bend left=45] node [above,align=center] {$\isAccel,$\\$ \varnothing$} (q_1)
+		  edge [bend left=45] node [above,align=center] {$\isAccel,$\\$ \rpmGear$} (q_1)
             (q_1) 
 		  edge [loop right]   node [above right,xshift=-0.5cm,align=center]        {$\isAccel,$\\$ \speedGear$} ()
-		  edge [bend left=45] node [below,align=center] {$\neg \isAccel,$\\$ \rpmGear$} (q_0);
+		  edge [bend left=45] node [below,align=center] {$\neg \isAccel,$\\$ \varnothing$} (q_0);
 \end{tikzpicture}
 \caption{A mealy machine of multiple composed neural networks}
 \label{fig:components}

@@ -1,4 +1,4 @@
-#Haskell Binding to TORCS
+# Haskell Binding to TORCS
 
 requires 
 
@@ -13,17 +13,25 @@ on Ubunutu 16.04, you may need to comment out line 70 in src/modules/simu/simuv2
 
 ## Usage
 
+To install, go to the top level directory, and run 'cabal install'
+
 See the examples folder for how to program a controller.
 
 You can load up the examples and run them with 'cabal repl' on the top directory. 
 This will load TORCS.hs, which loads a few examples that can be connected to TORCS.
+As an example, first open TORCS to a quick race and set the player to src_server1. 
+Then on the command line run:
+
+    $> cabal repl
+    ghci> simpleDrive
+
 
 TODO
 
 - write controller for basic platoon
 - build and ship to hackage
 
-# Using machine learning with TORCS
+## Using machine learning with TORCS
 
 Race Mode : Practice
 Configure Race -> Last page of options, switch 'display' from 'normal' to 'results only'
