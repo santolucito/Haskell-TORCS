@@ -13,7 +13,9 @@ on Ubunutu 16.04, you may need to comment out line 70 in src/modules/simu/simuv2
 
 ## Usage
 
-To install, go to the top level directory, and run 'cabal install'
+To install, go to the top level directory, and run 'cabal install'.
+You only need to do 'cabal install' the first time, or whenever you change the cabal file.
+Later on, just 'cabal repl' is fine.
 
 See the examples folder for how to program a controller.
 
@@ -26,12 +28,12 @@ Then on the command line run:
     ghci> simpleDrive
 
 
-TODO
-
-- write controller for basic platoon
-- build and ship to hackage
-
-## Using machine learning with TORCS
+### Using machine learning with TORCS
 
 Race Mode : Practice
 Configure Race -> Last page of options, switch 'display' from 'normal' to 'results only'
+
+### TODO
+
+- write controller for basic platoon
+- build and ship to hackage

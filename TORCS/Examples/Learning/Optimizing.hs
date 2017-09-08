@@ -45,7 +45,7 @@ calcCost (c, d) =
 -- | have to wait for torcs to start before we try to connect
 --   TODO use some shell stuff to get the status of torcs (or the port it opens)
 startTORCS = 
-  spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> 
+  spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> --NB torcs requires full path
   threadDelay 100000  
 
 threeLapDriver :: Thetas -> Driver
