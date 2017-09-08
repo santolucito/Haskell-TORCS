@@ -1,8 +1,16 @@
 \section{Introduction}
 
+We use automata to structure the combination of multiple neural networks.
+Recurrent Neural Networks have been shown to correspond in computational (classification) power to deterministic finite automata~\cite{tino1998finite}.
+While previous work had provided a translation from RNNs to DFAs, we show that this space can be seen as a spectrum.
+By building systems that exist in between an RNN and a DFA we can gain the scalable power of RNN learning, but use DFAs at a high level to provide formal guarantees on the behavior of the system.
+
 \subsection{Machine Learning for CPS}
 
 Neural networks are used in building systems of autonomous vehicles, in both components such as vision systems, as well as top-level controllers that drive the car down the road.
+
+Previous work has combined multiple smaller neural networks to create systems with better properties than monolithic learners~\cite{masoudnia2014mixture,baldacchino2016variational}.
+We are the first to propose using Mealy Machines as a combination framework for neural networks.
 
 \subsection{Legibility}
 

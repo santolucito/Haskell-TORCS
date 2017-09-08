@@ -4,7 +4,7 @@
 
 \begin{document}
 
-\title{A Compositional Neural Network framework to protect against man-in-the-middle attacks}
+\title{Mixing Experts with Program Synthesis: Building Verified Neural Network-based Autonomous Vehicle Controllers}
 %
 % You need the command \numberofauthors to handle the 'placement
 % and alignment' of the authors beneath the title.
@@ -81,7 +81,10 @@ one who did all the really hard work.}\\
 
 Machine learning has been leveraged to great effect in the construction of efficient and performant cyber physical systems.
 However, this has introduced the problem of legibility - it is hard to make formal arguments about the behavior of learned systems.
-We propose an approach to structured machine learning by leveraging reactive program synthesis.
+We propose an approach to structured machine learning by leveraging program synthesis.
+We synthesis automata from temporal logic specifications, and use the automata as a combination strategy for many smaller neural networks.
+We provide a measure of the attack surface of a neural network, and demonstrate that our approach results in safer systems.
+As a case study, we run simulate an sensor spoofing attack in a vehicle simulator and measure the time to recovery for our system and a typical monolithic controller.
 
 \end{abstract}
 
