@@ -72,6 +72,7 @@ startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket conn
     connectMe = do
       unless gui $ spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> return ()--NB torcs requires full path
       threadDelay delay
+      threadDelay 100000
       (serveraddr:_) <- getAddrInfo
                           (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
                           Nothing (Just port)
@@ -80,24 +81,20 @@ startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket conn
 
       -- send some mysterious message to get the race started
       let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
-      let attemptSend = sendTo sock mysteryString (addrAddress serveraddr)
-      -- if the port was ready, then we can start recving msgs
-      let tryRecv = timeout 10000 $ try (attemptSend >> recvFrom sock 1024) :: IO (Maybe (Either (SomeException) (ByteString, SockAddr)))
-      iterateWhile ( isLeft. fromJust ) (putStr "." >> tryRecv )
---      _ <- either (\x -> print x >> print "port wasnt ready" >> threadDelay 100000 >> print "waited" >> sendTo sock mysteryString (addrAddress serveraddr) >>= print >> print "sent 2nd atmpt" >> recvFrom sock 1024) (return) x
-      print "moving on"
+      sendTo sock mysteryString (addrAddress serveraddr)
       return sock
 
 --the id (port number) is used to choose this car's writing mvar
--- this won't start until we are sure we are connected
 yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO (CarState, DriveState)
 yampaRunner myDriver allChannels id conn = do
-  (msg,addr) <- recvFrom conn 1024
+  --let trySend = timeout 10000 $ try (attemptSend) :: IO (Maybe (Either (SomeException) Int))
+  print "I am here"
   t <- getCurrentTime
   timeRef <- newIORef t
   driveRef <- newIORef defaultDriveState
   carRef <- newIORef defaultCarState
   let myChannel = read id :: Int
+  (msg,addr) <- recvFrom conn 1024
   reactimate
     (return NoEvent)
     (sense timeRef conn allChannels carRef)
