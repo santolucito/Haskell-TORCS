@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE MultiWayIf #-}
-module TORCS.Connect (startDriver_,startDriver,startDrivers) where
+module TORCS.Connect (startDriver_,startDriver,startGUIDriver,startDrivers) where
 
 import Network.Socket hiding (sendTo,recvFrom)
 import Network.Socket.ByteString (sendTo,recvFrom)
@@ -10,6 +10,8 @@ import Control.Exception
 import qualified Control.Monad.Parallel as P
 import Control.Concurrent
 import Control.Concurrent.MVar
+import Control.Monad 
+import Control.Monad.Loops
 
 import Prelude hiding (concat)
 import Data.IORef
@@ -19,14 +21,29 @@ import Data.ByteString (ByteString,concat)
 import Data.ByteString.Char8 (pack)
 import Data.Tuple
 import Data.Maybe
+import Data.Either
 
 import System.Exit 
+import System.Timeout
+import System.Process
 
 import FRP.Yampa 
 
 import TORCS.Types
 import TORCS.Parser
 
+
+-- | if starting a single driver, we dont need any communication channels (mvar)
+startDriver :: Driver -> IO(CarState, DriveState)
+startDriver d    = startDriverWithPort False M.empty d 0 "3001" 
+
+-- | start a single driver but dont get the final state of the car at the end
+startDriver_ :: Driver -> IO()
+startDriver_ d   = startDriver d >> return ()
+
+-- | Use this if you want to watch the car drive in TORCS 
+--   requires booting up TORCS manually
+startGUIDriver d = startDriverWithPort True M.empty d 0 "3001" 
 
 -- | To simulate platooning
 --   we create comm channels between all vehicles that we start
@@ -38,28 +55,41 @@ startDrivers ds = do
     ps = map show [3001..]
     ts = map (*1000000) [0,1..]
     cs = zip (zip ds ts) ps
-  P.mapM_ ((uncurry. uncurry) (startDriverWithPort mvars)) cs 
+  P.mapM_ ((uncurry. uncurry) (startDriverWithPort False mvars)) cs 
   return ()
 
--- if starting a single driver, we dont need any communication channels (mvar)
-startDriver d = startDriverWithPort M.empty d 0 "3001" 
-startDriver_ d = startDriver d >> return ()
+-- | have to wait for torcs to start before we try to connect
+--   TODO use some shell stuff to get the status of torcs (or the port it opens)
+--   spawnTORCS sock = do  
+--     spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] --NB torcs requires full path
+--     untilM_ (putStrLn "waiting on TORCS port..." >> threadDelay 10000) (isReadable sock)
+--     putStrLn "TORCS port is open"
 
-startDriverWithPort :: M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
-startDriverWithPort mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
+
+startDriverWithPort :: Bool -> M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
+startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
   where
     connectMe = do
+      unless gui $ spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> return ()--NB torcs requires full path
       threadDelay delay
       (serveraddr:_) <- getAddrInfo
                           (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
                           Nothing (Just port)
       sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
       connect sock (addrAddress serveraddr)
+
+      -- send some mysterious message to get the race started
       let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
-      _ <- sendTo sock mysteryString (addrAddress serveraddr)
+      let attemptSend = sendTo sock mysteryString (addrAddress serveraddr)
+      -- if the port was ready, then we can start recving msgs
+      let tryRecv = timeout 10000 $ try (attemptSend >> recvFrom sock 1024) :: IO (Maybe (Either (SomeException) (ByteString, SockAddr)))
+      iterateWhile ( isLeft. fromJust ) (putStr "." >> tryRecv )
+--      _ <- either (\x -> print x >> print "port wasnt ready" >> threadDelay 100000 >> print "waited" >> sendTo sock mysteryString (addrAddress serveraddr) >>= print >> print "sent 2nd atmpt" >> recvFrom sock 1024) (return) x
+      print "moving on"
       return sock
 
 --the id (port number) is used to choose this car's writing mvar
+-- this won't start until we are sure we are connected
 yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO (CarState, DriveState)
 yampaRunner myDriver allChannels id conn = do
   (msg,addr) <- recvFrom conn 1024

@@ -19,6 +19,7 @@ import System.Random
 
 import Control.Lens
 
+import Debug.Trace
 
 -- | Use data type Theta for params to be passed to driver
 multiVarSGD :: _ -> Int -> Double -> Double -> Thetas -> Thetas -> (Thetas -> IO Double) -> Thetas
@@ -32,7 +33,7 @@ multiVarSGD thetaSelectors batchSize goal learnRate t t_prev f =
   in
     if not converged
     then continueGD
-    else t
+    else trace "finished SGD" t
 
 stochasticBatch :: Int -> [a] -> [a]
 stochasticBatch batchSize xs =
@@ -52,6 +53,6 @@ takeStep learnRate t f part updatedTheta =
 partialDerivative :: (Thetas -> IO Double) -> _Lens -> Thetas -> IO Double
 partialDerivative f part t = do
   x1 <- f t
-  x2 <- f (over part (\x->x*1.01) t)
+  x2 <- f (over part (\x -> x*1.01) t)
   return $ ((x2 - x1) / 0.01)
 

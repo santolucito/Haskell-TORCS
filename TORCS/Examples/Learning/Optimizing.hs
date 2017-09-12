@@ -14,13 +14,17 @@ import TORCS.Examples.Learning.Simple
 import TORCS.Examples.Learning.SGD
 import Debug.Trace
 
+
 import System.Process
-import System.IO.Unsafe
 
 import System.Random.Shuffle
 import System.Random
 
 import Control.Lens
+import Control.Exception
+
+import System.IO.Unsafe
+
 
 optimize :: Thetas
 optimize = 
@@ -32,7 +36,7 @@ optimize =
 evalDriver :: Thetas -> IO Double
 evalDriver t@Thetas{..} = do
   print $ "Attemping with params: "++(show t)
-  endState <- startTORCS >> (startDriver $ threeLapDriver t)
+  endState <- (startDriver $ threeLapDriver t)
   print $ "Cost = "++(show $ calcCost endState)++" with params: "++(show t)
   runCommand $ "echo "++(show _speed)++","++(show $ calcCost endState)++">> test.csv"
   return $ calcCost endState
@@ -41,12 +45,6 @@ evalDriver t@Thetas{..} = do
 calcCost :: (CarState,DriveState) -> Double
 calcCost (c, d) =
   (damage c) + (sum $ lapTimes c)
-
--- | have to wait for torcs to start before we try to connect
---   TODO use some shell stuff to get the status of torcs (or the port it opens)
-startTORCS = 
-  spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> --NB torcs requires full path
-  threadDelay 100000  
 
 threeLapDriver :: Thetas -> Driver
 threeLapDriver t = proc e -> do
@@ -58,6 +56,6 @@ threeLapDriver t = proc e -> do
 -- restart after 3 laps or if one lap times out (200 sec here) 
 restarting :: ([Double],Double) -> Int
 restarting (lapTs,ct) = 
-    if (length lapTs > 3) || ct > timeout then 1 else 0
+    if (length lapTs >= 4) || ct > timeout then 1 else 0
   where
     timeout = 200
