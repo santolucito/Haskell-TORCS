@@ -26,6 +26,9 @@ import Data.Either
 import System.Exit 
 import System.Timeout
 import System.Process
+import System.Directory
+
+import GHC.IO.Handle
 
 import FRP.Yampa 
 
@@ -47,6 +50,7 @@ startGUIDriver d = startDriverWithPort True M.empty d 0 "3001"
 
 -- | To simulate platooning
 --   we create comm channels between all vehicles that we start
+-- TODO must seperate startTORCS IO from startDriverWtihPort to have everyone race in same torcs instance
 startDrivers  :: [Driver] -> IO()
 startDrivers ds = do
   mvars' <- mapM (\x->newEmptyMVar) ds :: IO [MVar String]
@@ -58,43 +62,37 @@ startDrivers ds = do
   P.mapM_ ((uncurry. uncurry) (startDriverWithPort False mvars)) cs 
   return ()
 
--- | have to wait for torcs to start before we try to connect
---   TODO use some shell stuff to get the status of torcs (or the port it opens)
---   spawnTORCS sock = do  
---     spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] --NB torcs requires full path
---     untilM_ (putStrLn "waiting on TORCS port..." >> threadDelay 10000) (isReadable sock)
---     putStrLn "TORCS port is open"
-
-
+        --NB torcs requires full path
 startDriverWithPort :: Bool -> M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
 startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
   where
     connectMe = do
-      unless gui $ spawnProcess "torcs" ["-r /home/mark/.torcs/config/raceman/practice.xml"] >> return ()--NB torcs requires full path
-      threadDelay delay
-      threadDelay 100000
+      homeDir <- getHomeDirectory
+      unless gui $ createProcess (proc "torcs" ["-r "++homeDir++"/.torcs/config/raceman/practice.xml"]) {std_out = CreatePipe} >> return ()
       (serveraddr:_) <- getAddrInfo
                           (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
                           Nothing (Just port)
       sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
       connect sock (addrAddress serveraddr)
 
-      -- send some mysterious message to get the race started
+      threadDelay delay
+      threadDelay 100000
       let mysteryString = concat["SCR",(pack $ show port),"(init -90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90)"] 
-      sendTo sock mysteryString (addrAddress serveraddr)
+      sendTo sock mysteryString (addrAddress serveraddr) 
       return sock
 
+  
 --the id (port number) is used to choose this car's writing mvar
 yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO (CarState, DriveState)
 yampaRunner myDriver allChannels id conn = do
   --let trySend = timeout 10000 $ try (attemptSend) :: IO (Maybe (Either (SomeException) Int))
-  print "I am here"
   t <- getCurrentTime
   timeRef <- newIORef t
   driveRef <- newIORef defaultDriveState
   carRef <- newIORef defaultCarState
   let myChannel = read id :: Int
   (msg,addr) <- recvFrom conn 1024
+  print "Starting new driver"
   reactimate
     (return NoEvent)
     (sense timeRef conn allChannels carRef)

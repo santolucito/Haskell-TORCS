@@ -21,6 +21,8 @@ cabal.project.local
 
 paper/buildpdf.sh
 
+test.csv 
+
 *.aux
 *.glo
 *.idx
