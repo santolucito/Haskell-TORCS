@@ -7,11 +7,26 @@ Since our synthesis procedure requires implementations of the pure functions to 
 
 \subsection{Optimization}
 As a simpler case, we first provide rough implementations of the pure functions, leaving out only the critical values such as target speed and turning radius.
-We use stochastic gradient descent to find optmimal values (where the cost is the lap time) to be embedded in the pure functions.
+We use stochastic gradient descent to find optimal values (where the cost is the lap time) to be embedded in the pure functions.
 
 
 \subsection{Full Synthesis}
-In this section we demonstrate how to use a nueral network to generate the low level interpretation of the pure functions to machine learning.
+In this section we demonstrate how to use a neural network to generate the low level interpretation of the pure functions to machine learning.
 In this way, we still rely on the formalized program synthesis to give us a correct by construction framework for the driver.
 
+\subsection{Neural Networks for TORCS}
 
+Building a autonomous vehicle for TORCS has previously explored in a number of studies~\cite{torcsNN}.
+This task falls into the domain of reinforcement learning, as there is no correct driver that we are trying to model - we only try to minimize the cost.
+In our case, we model the cost by the speed and damage of the car during the course of the race.
+We use a discounted reward to account for the immediate effect driving decisions.
+
+The model we are building is a stochastic policy network.
+At every time step where we receive sensor information, we will probablistically choose an action according to the current weight in the model.
+The model will update the probabilistic weights as it trains, so that the correct action is more likely to taken.
+
+In this work, we do not try to introduce any better way of training a neural network for TORCS.
+We just build a monolithic model that is sufficient to get around the track with reasonable finesse to compare to the structured compositional network.
+Specifically, we are not interested in performance to the respective networks, but only the safety.
+% we really should be using a RNN to compare to the structured network b/c of the correspondence between RNN and DFA
+% but that is way too much work to implement

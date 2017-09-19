@@ -12,6 +12,7 @@ import TORCS.Connect
 import Control.Concurrent
 import TORCS.Examples.Learning.Simple
 import TORCS.Examples.Learning.SGD
+import TORCS.Examples.Learning.NN
 import Debug.Trace
 
 
@@ -56,6 +57,6 @@ threeLapDriver t = proc e -> do
 -- restart after 3 laps or if one lap times out (200 sec here) 
 restarting :: ([Double],Double) -> Int
 restarting (lapTs,ct) = 
-    if (length lapTs >= 4) || ct > timeout then 1 else 0
+    if (length lapTs >= 2) || ct > timeout then 1 else 0
   where
     timeout = 200
