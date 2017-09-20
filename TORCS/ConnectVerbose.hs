@@ -74,7 +74,6 @@ yampaRunner myDriver allChannels id conn = do
   carRef <- newIORef [defaultCarState]
   let myChannel = read id :: Int
   (msg,addr) <- recvFrom conn 1024
-  print "Starting new driver"
   reactimate
     (return NoEvent)
     (sense timeRef conn allChannels carRef)

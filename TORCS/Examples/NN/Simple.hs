@@ -32,7 +32,7 @@ nnDriver cm = proc e -> do
 shifting :: CarModel -> (Double,Int) -> Int
 shifting cm (r,g) = let
   f = model cm
-  (pUp, pDown, pSame) = traceMe $ (model cm) (r,g)
+  (pUp, pDown, pSame) = (\(u,d,s) -> let sum = u+d+s in (u/sum,d/sum,s/sum)) $ (model cm) (r/1000, (((fromIntegral g)::Double)/6))
   rand = unsafePerformIO (randomIO :: IO Double)
  in if
   | rand < pUp -> min 6 (g+1)
@@ -47,6 +47,6 @@ getE  e = case e of
 type CarModel = StdModel
                      (Vector 2)
                      (Vector 3)
-                     (Double, Int)
+                     (Double, Double)
                      (Double, Double, Double)
 
