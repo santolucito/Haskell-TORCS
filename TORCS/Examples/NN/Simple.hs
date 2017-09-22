@@ -26,18 +26,23 @@ import System.IO.Unsafe
 nnDriver :: CarModel -> Driver
 nnDriver cm = proc e -> do
     CarState{..} <- arr getE -< e
-    g <- arr (shifting cm) -< (rpm,gear')
-    returnA -< defaultDriveState {accel = 1, gear = g}
+    a <- arr (gas cm) -< (rpm,speedX)
+    b <- arr (b cm) -< (rpm,speedX)
+    returnA -< defaultDriveState {accel = a, brakes = b, gear = 1}
 
-shifting :: CarModel -> (Double,Int) -> Int
-shifting cm (r,g) = let
+gas :: CarModel -> (Double,Double) -> Double
+gas cm (r,s) = let
   f = model cm
-  (pUp, pDown, pSame) = (\(u,d,s) -> let sum = u+d+s in (u/sum,d/sum,s/sum)) $ (model cm) (r/1000, (((fromIntegral g)::Double)/6))
   rand = unsafePerformIO (randomIO :: IO Double)
- in if
-  | rand < pUp -> min 6 (g+1)
-  | rand > pUp && rand < pUp+pDown -> max 1 (g-1)
-  | otherwise  -> g
+ in 
+   if rand > (fst $ f (r,s)) then 1 else 0
+
+b :: CarModel -> (Double,Double) -> Double
+b cm (r,s) = let
+  f = model cm
+  rand = unsafePerformIO (randomIO :: IO Double)
+ in 
+   if rand > (snd $ f (r,s)) then 0.3 else 0
 
 getE :: Event CarState -> CarState
 getE  e = case e of
@@ -46,7 +51,7 @@ getE  e = case e of
 
 type CarModel = StdModel
                      (Vector 2)
-                     (Vector 3)
+                     (Vector 2)
                      (Double, Double)
-                     (Double, Double, Double)
+                     (Double, Double)
 
