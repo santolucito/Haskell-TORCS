@@ -35,8 +35,8 @@ learnDriver = do
     m <- modelR carModel 
     cnt <- newIORef 0
     runEffect $
-            geneticTrain (startDriverNN') 10 m
-        >-> reportTSP 1000 (report cnt)
+            geneticTrain (startDriverNN') 10 (0,m)
+        >-> reportTSP 1 (report cnt)
         >-> consumeTSP check
 
   where
@@ -68,13 +68,21 @@ learnDriver = do
     startDriverNN' :: CarModel -> IO Double
     startDriverNN' cm = do
        rawOut <- startDriverVerbose $ dragRacer cm
+       print $ ((\(x,y,z) -> z) .head) rawOut
        return $ ((\(x,y,z) -> z) .head) rawOut
 
     report cnt ts = do
       putStrLn ""
+      putStrLn ""
       modifyIORef cnt (+1)
       curr <- readIORef cnt
       putStrLn $ (show $ curr*50) ++ " tests"
+      print "current best - "
+      (startDriverNN' $ tsModel ts) >>= print
+      print ""
+      print ""
+
+      
 {-      putStrLn $ "error = "++(show $ tsBatchError ts)
       createProcess (shell "torcs" ) {std_out = CreatePipe}
       threadDelay 10000000
