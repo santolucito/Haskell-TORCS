@@ -35,8 +35,7 @@ learnDriver = do
     m <- modelR carModel 
     cnt <- newIORef 0
     runEffect $
-            (reinforcementBatchP startDriverNN 1000
-        +>> reinforceDescentP m 1 (const 0.5))
+            geneticTrain (startDriverNN') 10 m
         >-> reportTSP 1000 (report cnt)
         >-> consumeTSP check
 
@@ -66,12 +65,17 @@ learnDriver = do
        print $ (\(cs,dr,c) -> c) $ head outD
        return outD
 
+    startDriverNN' :: CarModel -> IO Double
+    startDriverNN' cm = do
+       rawOut <- startDriverVerbose $ dragRacer cm
+       return $ ((\(x,y,z) -> z) .head) rawOut
+
     report cnt ts = do
       putStrLn ""
       modifyIORef cnt (+1)
       curr <- readIORef cnt
       putStrLn $ (show $ curr*50) ++ " tests"
-      putStrLn $ "error = "++(show $ tsBatchError ts)
+{-      putStrLn $ "error = "++(show $ tsBatchError ts)
       createProcess (shell "torcs" ) {std_out = CreatePipe}
       threadDelay 10000000
       putStrLn "starting practice"
@@ -80,7 +84,7 @@ learnDriver = do
       _ <- startGUIDriverVerbose $ dragRacer $ tsModel ts
       threadDelay 4000000
       createProcess $ shell "./killTORCS.sh"
-      threadDelay 4000000
+      threadDelay 4000000-}
       putStrLn ""
 
     check ts = return Nothing

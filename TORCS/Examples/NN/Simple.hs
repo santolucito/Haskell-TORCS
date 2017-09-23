@@ -31,18 +31,20 @@ nnDriver cm = proc e -> do
     returnA -< defaultDriveState {accel = a, brakes = b, gear = 1}
 
 gas :: CarModel -> (Double,Double) -> Double
-gas cm (r,s) = let
+gas cm (r,s) = fst $ (model cm) (r,s)
+{-let
   f = model cm
   rand = unsafePerformIO (randomIO :: IO Double)
  in 
-   if rand > (fst $ f (r,s)) then 1 else 0
+   if rand > (fst $ f (r,s)) then 1 else 0-}
 
 b :: CarModel -> (Double,Double) -> Double
-b cm (r,s) = let
+b cm (r,s) = snd $ (model cm) (r,s)
+{-let
   f = model cm
   rand = unsafePerformIO (randomIO :: IO Double)
  in 
-   if rand > (snd $ f (r,s)) then 0.3 else 0
+   if rand > (snd $ f (r,s)) then 0.3 else 0-}
 
 getE :: Event CarState -> CarState
 getE  e = case e of
