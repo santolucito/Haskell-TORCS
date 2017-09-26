@@ -8,14 +8,14 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE NamedWildCards #-}
 
-module TORCS.Examples.NN.NN where
+module TORCS.Examples.NN.NN2 where
 
 import FRP.Yampa hiding (derivative)
 
 import TORCS.Types
 import TORCS.ConnectVerbose
 import Control.Concurrent
-import TORCS.Examples.NN.Simple
+import TORCS.Examples.NN.Automata
 import Debug.Trace
 
 import System.Process
@@ -30,48 +30,41 @@ import           Pipes.Core
 
 import Data.IORef
 
+
 learnDriver :: IO ()
 learnDriver = do
-    m <- modelR carModel 
+    gm <- modelR gasModel 
+    bm <- modelR brakeModel 
     cnt <- newIORef 0
     runEffect $
-            geneticTrain (startDriverNN') 10 2 (0,m)
+            geneticTrainL (\m-> startDriverNN' gm m) 10 (0,(gm,bm))
         >-> reportTSP 1 (report cnt)
         >-> consumeTSP check
 
   where
 
-    -- the model takes the current rpm and current gear, and gives the probablity that we should shift up, down, or stay the same
-    carModel :: CarModel
-    carModel = mkStdModel
+    brakeModel :: GasModel
+    brakeModel = mkStdModel
         (logisticLayer . (logisticLayer :: Layer 2 4)) -- trying out 4 hidden nodes
-        (\(gas,brakes) -> Diff $ Identity . sqDiff (cons (fromDouble gas) (cons (fromDouble brakes) nil)))--(cons (fromDouble up) (cons (fromDouble down) (cons (fromDouble same) nil))) ) --cost fxn for probs 
+        (\b -> Diff $ Identity . sqDiff (cons (fromDouble b) nil))--(cons (fromDouble up) (cons (fromDouble down) (cons (fromDouble same) nil))) ) --cost fxn for probs 
         (\(rpm,speed) -> cons rpm (cons (speed) nil)) --convert input signal to a vector of doubles
-        (\v -> (vhead v,vhead $ vtail v)) --, vhead $ vtail $ vtail v))
+        (\v -> vhead v) --, vhead $ vtail $ vtail v))
+    
+    gasModel :: GasModel
+    gasModel = mkStdModel
+        (logisticLayer . (logisticLayer :: Layer 2 4)) -- trying out 4 hidden nodes
+        (\(gas) -> Diff $ Identity . sqDiff (cons (fromDouble gas) nil))--(cons (fromDouble up) (cons (fromDouble down) (cons (fromDouble same) nil))) ) --cost fxn for probs 
+        (\(rpm,speed) -> cons rpm (cons (speed) nil)) --convert input signal to a vector of doubles
+        (\v -> vhead v) --, vhead $ vtail $ vtail v))
   
-    -- run TORCS and collect input/output actions pairs with their cost
-    -- TODO should use a dicounted delayed future reward of rather than whole race cost
-    startDriverNN :: CarModel -> IO [((Double, Double), (Double, Double), Double)] 
-    startDriverNN cm = do
-       rawOut <- startDriverVerbose $ dragRacer cm
-       --TODO need to get actions from gear change - will require looking at previous step (actually just folding here should work)
-       let 
-        outD = 
-           map 
-           (\(cs,dr,c) ->  ((rpm cs, speedX cs), (accel dr, brakes dr), c/10))
-           rawOut 
-       --print $ sum $ map (\(cs,dr,c) -> dr) outD 
-       --print outD
-       print $ (\(cs,dr,c) -> c) $ head outD
-       return outD
 
-    startDriverNN' :: CarModel -> IO Double
-    startDriverNN' cm = do
-       rawOut <- startDriverVerbose $ dragRacer cm
+startDriverNN' :: GasModel -> BrakeModel -> IO Double
+startDriverNN' gm bm = do
+       rawOut <- startDriverVerbose $ automataRacer gm bm
        print $ ((\(x,y,z) -> z) .head) rawOut
        return $ ((\(x,y,z) -> z) .head) rawOut
 
-    report cnt ts = do
+report cnt ts = do
       putStrLn ""
       putStrLn ""
       modifyIORef cnt (+1)
@@ -79,8 +72,8 @@ learnDriver = do
       putStrLn $ (show $ curr*50) ++ " tests"
       print "current best - "
       (startDriverNN' $ tsModel ts) >>= print
-      print ""
-      print ""
+      putStrLn ""
+      putStrLn ""
 
       
 {-      putStrLn $ "error = "++(show $ tsBatchError ts)
