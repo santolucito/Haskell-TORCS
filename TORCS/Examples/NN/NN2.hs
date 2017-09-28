@@ -37,8 +37,8 @@ learnDriver = do
     bm <- modelR brakeModel 
     cnt <- newIORef 0
     runEffect $
-            geneticTrainL (\(gm,bm) -> startDriverNN' gm bm) 10 (0,(gm,bm))
---        >-> reportTSP 1 (report cnt)
+            geneticTrainL (\(gm,bm) -> startDriverNN' gm bm) 10 3 (0,(gm,bm))
+        >-> reportTSP 1 (report cnt)
         >-> consumeTSP check
 
   where
@@ -64,7 +64,7 @@ startDriverNN' gm bm = do
        print $ ((\(x,y,z) -> z) .head) rawOut
        return $ ((\(x,y,z) -> z) .head) rawOut
 
-{-
+
 report cnt ts = do
       putStrLn ""
       putStrLn ""
@@ -72,10 +72,10 @@ report cnt ts = do
       curr <- readIORef cnt
       putStrLn $ (show $ curr*50) ++ " tests"
       print "current best - "
-      (startDriverNN' $ tsModel ts) >>= print
+      print $ tsBatchError ts
       putStrLn ""
       putStrLn ""
--}
+
       
 {-      putStrLn $ "error = "++(show $ tsBatchError ts)
       createProcess (shell "torcs" ) {std_out = CreatePipe}

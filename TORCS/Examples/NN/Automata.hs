@@ -21,6 +21,7 @@ import           Pipes.Core
 
 import System.Random
 import System.IO.Unsafe
+import Debug.Trace
 
 --a drag racer that goes staight
 nnDriver2 :: GasModel -> BrakeModel -> Driver
@@ -28,7 +29,15 @@ nnDriver2 gm bm = proc e -> do
     CarState{..} <- arr getE -< e
     a <- arr (gas gm) -< (rpm,speedX)
     b <- arr (b bm) -< (rpm,speedX)
+    rec
+       c' <- iPre  0 -< c
+       ctr' <- iPre  0 -< ctr
+       ctr <- arr (+1) -< ctr'
+       c <- arr printLast -< (a,b,c',ctr)
     returnA -< defaultDriveState {accel = a, brakes = b, gear = 1}
+
+printLast (a,b,c,ctr) = 
+  if ctr ==500 then traceMe c else ((a-b)+c)
 
 gas :: GasModel -> (Double,Double) -> Double
 gas cm (r,s) = (model cm) (r,s)

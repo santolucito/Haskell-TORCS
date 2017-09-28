@@ -35,8 +35,10 @@ learnDriver = do
     m <- modelR carModel 
     cnt <- newIORef 0
     runEffect $
-            geneticTrain (startDriverNN') 10 2 (0,m)
-        >-> reportTSP 1 (report cnt)
+--            geneticTrain (startDriverNN') 10 2 (0,m)
+            (reinforcementBatchP startDriverNN 1000
+        +>> reinforceDescentP m 1 (const 0.5))
+        >-> reportTSP 50 (report cnt)
         >-> consumeTSP check
 
   where
