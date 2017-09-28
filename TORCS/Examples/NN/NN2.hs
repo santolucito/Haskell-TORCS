@@ -37,8 +37,8 @@ learnDriver = do
     bm <- modelR brakeModel 
     cnt <- newIORef 0
     runEffect $
-            geneticTrainL (\m-> startDriverNN' gm m) 10 (0,(gm,bm))
-        >-> reportTSP 1 (report cnt)
+            geneticTrainL (\(gm,bm) -> startDriverNN' gm bm) 10 (0,(gm,bm))
+--        >-> reportTSP 1 (report cnt)
         >-> consumeTSP check
 
   where
@@ -64,6 +64,7 @@ startDriverNN' gm bm = do
        print $ ((\(x,y,z) -> z) .head) rawOut
        return $ ((\(x,y,z) -> z) .head) rawOut
 
+{-
 report cnt ts = do
       putStrLn ""
       putStrLn ""
@@ -74,7 +75,7 @@ report cnt ts = do
       (startDriverNN' $ tsModel ts) >>= print
       putStrLn ""
       putStrLn ""
-
+-}
       
 {-      putStrLn $ "error = "++(show $ tsBatchError ts)
       createProcess (shell "torcs" ) {std_out = CreatePipe}
@@ -85,10 +86,10 @@ report cnt ts = do
       _ <- startGUIDriverVerbose $ dragRacer $ tsModel ts
       threadDelay 4000000
       createProcess $ shell "./killTORCS.sh"
-      threadDelay 4000000-}
+      threadDelay 4000000
       putStrLn ""
-
-    check ts = return Nothing
+-}
+check ts = return Nothing
 
 ----------
 --
@@ -101,10 +102,10 @@ calcCost :: (CarState,DriveState) -> Double
 calcCost (c, d) =
   (damage c) + (curLapTime c)
 
-dragRacer:: CarModel -> Driver
-dragRacer cm = proc e -> do
+automataRacer:: GasModel -> BrakeModel -> Driver
+automataRacer gm bm = proc e -> do
   CarState{..} <- arr getE -< e
-  driveState <- nnDriver cm -< e
+  driveState <- nnDriver2 gm bm -< e
   m <- arr restarting -< (distRaced,curLapTime)
   returnA -< driveState {meta = m}
 
