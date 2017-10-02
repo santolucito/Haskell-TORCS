@@ -2,6 +2,14 @@
 \usetikzlibrary{positioning,automata}
 
 \newcommand{\fullNN}{\ensuremath{N(accel,break,rpm,speed,gear)}}
+\newcommand{\fullNNAtk}{\ensuremath{N(accel,break,rpm,speed_{ATK},gear)}}
 \newcommand{\isAccel}{\ensuremath{A(accel,brake)}}
 \newcommand{\speedGear}{\ensuremath{R(rpm,gear)}}
 \newcommand{\rpmGear}{\ensuremath{S(speed,gear)}}
+
+\newcommand{\isUnderAttack}{\ensuremath{Atk()}}
+
+\newcommand{\inputSig}[2]{\ensuremath{\sigma_{#1}^{#2}}}
+\newcommand{\outputSig}[2]{\ensuremath{\varsigma_{#1}^{#2}}}
+\newcommand{\atkBegin}{\ensuremath{a_{0}}}
+\newcommand{\atkLength}{\ensuremath{a}}

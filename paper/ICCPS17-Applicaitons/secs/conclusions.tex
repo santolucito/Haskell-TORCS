@@ -1,1 +1,12 @@
 \section{Conclusions}
+
+\subsection{Future Work}
+
+Since DFA are equivalent to Recurrent Neural Networks in expressibility, it would be interesting to replace the Mealy machine as a gating network with a RNN.
+It is possible that,in practice, the particular structure of the gating network is more powerful than required. 
+Instead, just by defining the subnetworks (the experts), this may be sufficient to maintain some safety properties.
+
+In our analysis we have only viewed this problem from a verification perspective. 
+An additional complexity is the actual learning rate and effectiveness of such a network structure.
+We know that the Mixture of Experts architecture can be used to reduce the training time in general, but so far we have not explored the effect of using a Mealy machine as the gating network on the learning process.
+Such an analysis is more well-suited to the machine learning community.
