@@ -9,5 +9,5 @@ import TORCS.Examples.SimpleExample
 import TORCS.Examples.ComplexExample
 --import TORCS.Examples.Learning.Optimizing
 import TORCS.Examples.MultiExample
-import TORCS.Examples.NN.NN
+import TORCS.Examples.NN.NN2
 
