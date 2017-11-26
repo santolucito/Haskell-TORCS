@@ -46,6 +46,7 @@ fromByteString s = let
       speedX = getField "speedX", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
+      distRaced = getField "distRaced", 
       lastLapTime = getField "lastLapTime", 
       curLapTime = getField "curLapTime", 
       gear' = floor $ getField "gear",
