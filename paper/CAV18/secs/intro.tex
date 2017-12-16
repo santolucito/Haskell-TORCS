@@ -12,6 +12,11 @@ These synthesized controllers have strong formal guarantees, but were not compet
 
 Neural networks are used in building systems of autonomous vehicles, in both components such as vision systems, as well as top-level controllers that drive the car down the road.
 
+End to end learning has been implemented previously in autonomous vehicles by Nvidia where a monolithic convolutional neural network was trained to map raw pixels from cameras to steering commands ~\cite{parallelforall}. This approach was shown to be successful in both simulation and real world tests.
+
+Other autonomous car developers such as Drive.ai have used segmented deep learning neural networks to control their vehicles ~\cite{}. These researchers argue that incorrect decisions made by an end-to-end system can be difficult to correct since the selection making process of these algorithms cannot be intuitively understood. Techniques such as blacking out portions of camera images to select only the sections are used by the researchers to control the input the algorithm receives. 
+
+
 Previous work has combined multiple smaller neural networks to create systems with better properties than monolithic learners~\cite{masoudnia2014mixture,baldacchino2016variational}.
 We are the first to propose using Mealy Machines as a combination framework for neural networks.
 
