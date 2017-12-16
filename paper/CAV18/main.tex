@@ -1,0 +1,63 @@
+
+\documentclass{llncs}
+
+\usepackage{llncsdoc}
+
+\input{preamble}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{Hybrid Automota Reachability for Sensor Spoofing Vulnerability Analysis}
+
+\author{\xspace}
+\institute{\xspace}
+
+\maketitle
+\begin{abstract}
+
+Neural networks have been leveraged to great effect in the construction of efficient and performant cyber physical systems.
+However, this has introduced a problem of legibility - it is difficult to make formal arguments about the behavior of learned systems.
+We propose an approach to structured machine learning by leveraging program synthesis.
+We synthesize automata from temporal logic specifications, and use the automata as a combination strategy for many smaller neural networks.
+We provide a measure of the attack surface of a neural network, and demonstrate that our approach results in safer systems.
+As a case study, we run simulate an sensor spoofing attack in a vehicle simulator and measure the time to recovery for our system and a typical monolithic controller.
+
+\end{abstract}
+
+\input{secs/intro}
+
+\input{secs/motiv}
+
+\input{secs/saftey}
+
+\input{secs/synth}
+
+\input{secs/torcs}
+
+\input{secs/related}
+
+\input{secs/conclusions}
+
+\bibliographystyle{splncs03}
+\bibliography{sigproc}
+
+\end{document}
+
+

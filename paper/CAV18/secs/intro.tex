@@ -1,9 +1,12 @@
 \section{Introduction}
 
+
 We use automata to structure the combination of multiple neural networks.
 Recurrent Neural Networks have been shown to correspond in computational (classification) power to deterministic finite automata~\cite{tino1998finite}.
 While previous work had provided a translation from RNNs to DFAs, we show that this space can be seen as a spectrum.
 By building systems that exist in between an RNN and a DFA we can gain the scalable power of RNN learning, but use DFAs at a high level to provide formal guarantees on the behavior of the system.
+
+These synthesized controllers have strong formal guarantees, but were not competitive in performance with those built with machine learning techniques. We are now combining the two approaches to leverage the power of neural networks, as well as the safety properties of formal synthesis.
 
 \subsection{Machine Learning for CPS}
 
@@ -23,4 +26,11 @@ As demonstrated in~\cite{DBLP:journals/iacr/Shoukry0TS15}, by non-intrusively at
 Under unreliable sensor data, autonomous vehicles must continue to behave, as best as is possible, in a safe manner.
 However, when using monolithic controllers, such as top-level neural networks for driving control, safely handling anomalous input remains a challenge.
 
-We propose a novel method of decomposition of cyber-physical systems controllers that minimize the attack surface and provide some formal guarantees on the result of a learned system.
+We identify our contributions as follows:
+\begin{enumerate}
+\item A method of compositional construction of cyber-physical systems controllers with neural network components.
+\item Using reactive program synthesis to build, and provide safety guarantees, for such systems.
+\item An evaluation of this approach in the vehicle simulator TORCS.
+\end{enumerate}
+
+

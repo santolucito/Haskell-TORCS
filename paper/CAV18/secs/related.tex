@@ -1,0 +1,31 @@
+\section{Related}
+
+\subsection{Mixture of Experts}
+
+From a machine learning perspective, we can view this architecture as an instance of the mixture of experts architecture.
+In this case, the Mealy machine acts as the \textit{Gating Network} in Fig.~\ref{fig:MOE}.
+By using an explicit structure for the gating networks (as opposed to another neural network), we enable a level of legibility over the entire system.
+
+\begin{figure}[h]  
+\centering 
+    \includegraphics[width=\linewidth]{MOE.png}
+    \caption{No interaction} \label{fig:M1}  
+\end{figure} 
+
+\begin{figure}[h!]  
+\centering 
+  \input{figs/musicFRP}
+\caption{Structure of synthesizes FRP program}
+\end{figure} 
+
+
+
+
+\subsection{Legibility of NNs}
+There are multiple existing definitions of safety for neural networks.
+However, none of the existing works provide a framework for evaluating the safety of multiple connected neural networks.
+
+\subsection{Program Synthesis}
+Correct by construction
+
+
