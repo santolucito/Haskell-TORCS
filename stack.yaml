@@ -1,0 +1,12 @@
+flags: {}
+extra-package-dbs: []
+packages:
+- location: .
+- location:
+    git: https://github.com/santolucito/neural.git
+    commit: ff7d02b1f14169391426bf3ddc2b5e54f6b638a8
+  extra-dep: true
+extra-deps:
+- vector-0.12.0.1
+- vector-sized-0.6.1.0
+resolver: lts-8.19
