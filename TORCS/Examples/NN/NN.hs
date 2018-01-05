@@ -35,9 +35,9 @@ learnDriver = do
     m <- modelR carModel 
     cnt <- newIORef 0
     runEffect $
---            geneticTrain (startDriverNN') 10 2 (0,m)
-            (reinforcementBatchP startDriverNN 1000
-        +>> reinforceDescentP m 1 (const 0.5))
+            geneticTrain (startDriverNN') 10 2 (0,m)
+--            (reinforcementBatchP startDriverNN 1000
+--        +>> reinforceDescentP m 1 (const 0.5))
         >-> reportTSP 50 (report cnt)
         >-> consumeTSP check
 
@@ -69,7 +69,7 @@ learnDriver = do
 
     startDriverNN' :: CarModel -> IO Double
     startDriverNN' cm = do
-       rawOut <- startDriverVerbose $ dragRacer cm
+       rawOut <- startGUIDriverVerbose $ dragRacer cm
        print $ ((\(x,y,z) -> z) .head) rawOut
        return $ ((\(x,y,z) -> z) .head) rawOut
 

@@ -58,17 +58,3 @@ When under attack, $x$ will flow towards an unsafe space (e.g. $x > 10$), when n
 \label{fig:hybridGear}
 \end{figure}
 
-
-\subsection{Mixture of Experts}
-
-From a machine learning perspective, we can view this architecture as an instance of the mixture of experts architecture.
-In this case, the Mealy machine acts as the \textit{Gating Network} in Fig.~\ref{fig:MOE}.
-By using an explicit structure for the gating networks (as opposed to another neural network), we enable a level of legibiilty over the entire system.
-
-\begin{figure}[h!] %[h] para here [b] para bottom [t] para top
-\centering
-	\includegraphics[width=0.49\textwidth]{MOE.png}
-\caption{Mixture of experts scheme.}
-\label{fig:MOE}
-\end{figure}
-
