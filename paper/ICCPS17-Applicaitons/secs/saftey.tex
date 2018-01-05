@@ -39,13 +39,14 @@ We express the safety of the system as reachability on a hybrid automata.
 This requires spliting the state $q_0$ to capture the two different dynamics of the systems according to the inputs streams.
 The inuition is that when under attack, the dynamics of the system approach some unsafe space, whereas during normal operations, the controller brings the system back into a safe space.
 In the example in Fig.~\ref{fig:hybridGear}, we use a $\dot{x}$ to represent the continuous flow of the value x induced by the control mode (e.g. \fullNN).
-When under attack, $x$ will flow towards an unsafe space (e.g. $x > 10$), when not under attack, the controller will push $x$ back to a safe space (e.g. $x\leq 10$)
+When under attack, $x$ will flow towards an unsafe space (e.g. $x > 10$), when not under attack, the controller will push $x$ back to a safe space (e.g. $x\leq 10$).
+
 
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}[shorten >=1pt,node distance=1.2cm,on grid]
-  \node[rectangle,draw]   (q_0)                {$\dot{x} = 1$};
-  \node[rectangle,draw]   (q_1) [below of=q_0] {$\dot{x} = -1$};
+	\node[rectangle,draw]   (q_0)                {$\dot{x} = f'(x,u)$};
+	\node[rectangle,draw]   (q_1) [below of=q_0] {$\dot{x} = f(x,u) $};
   \path[->] (q_0) 
 		  edge [loop above]   node  [above,align=center]         {$\neg\isUnderAttack,$\\$ \fullNN$} ();
 	\path[->] (q_0) edge [bend right] (q_1);

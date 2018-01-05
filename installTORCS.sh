@@ -1,7 +1,7 @@
 #an untested script that is roughly models the install process for torcs and the patch on linux
 
-mkdir torcs
-cd torcs
+mkdir torcs-install
+cd torcs-install
 #best to download these by hand
 #wget http://prdownloads.sourceforge.net/torcs/torcs-1.3.4.tar.bz2?download
 #wget https://sourceforge.net/projects/cig/files/SCR%20Championship/Server%20Linux/2.1/scr-linux-patch.tgz/download
