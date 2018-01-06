@@ -34,9 +34,7 @@ library
                        random-shuffle,
                        monad-loops,
                        MonadRandom,
-                       directory,
-                       neural >= 0.3.2,
-                       pipes
+                       directory
   default-language:    Haskell2010
   ghc-options: 
       -fno-warn-partial-type-signatures
