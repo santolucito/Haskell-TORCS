@@ -38,7 +38,7 @@ library
   default-language:    Haskell2010
   ghc-options: 
       -fno-warn-partial-type-signatures
---    -Wall 
+      -Wall 
    -- -O2 
    -- "-with-rtsopts= -s -h -i0.1"
 
