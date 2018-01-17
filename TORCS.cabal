@@ -21,7 +21,7 @@ library
    , TORCS.Types
   -- other-modules:       
   other-extensions:    Arrows, OverloadedStrings
-  build-depends:       base >=4.9 && <4.10, 
+  build-depends:       base >=4.9 && <4.11, 
                        time >=1.6 && <1.7,
                        bytestring >=0.10 && <0.11, 
                        network >=2.6 && <2.7, 

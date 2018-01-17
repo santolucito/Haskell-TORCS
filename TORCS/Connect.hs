@@ -7,7 +7,8 @@ import Control.Concurrent.MVar
 
 import TORCS.Types
 import TORCS.Parser
-import TORCS.Connect.YampaRunner (startDriverWithPort)
+--import TORCS.Connect.YampaRunner (startDriverWithPort)
+import TORCS.Connect.LolaRunner (startDriverWithPort)
 
 -- | if starting a single driver, we dont need any communication channels (mvar)
 startDriver :: Driver -> IO(CarState, DriveState)

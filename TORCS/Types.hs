@@ -65,7 +65,9 @@ data CarState = CarState {
   ,rpm            :: Double
   ,lastLapTime    :: Double
   ,lapTimes       :: [Double]
+  --nonnative to torrcs
   ,communications :: Communications
+  ,extra          :: String
 } deriving (Show)
 
 type Communications = M.Map Int (Maybe String)
@@ -92,4 +94,5 @@ defaultCarState = CarState {
   ,lastLapTime = 0
   ,lapTimes  = []
   ,communications = M.empty
+  ,extra = ""
 }
