@@ -54,7 +54,7 @@ data CarState = CarState {
   ,speedZ         :: Double
   ,damage         :: Double
   ,wheelSpinVel   :: [Double] -- length 4
-  ,focus          :: [Int]
+  ,focus'         :: [Int]
   ,track          :: [Double]
   ,curLapTime     :: Double
   ,speedX         :: Double
@@ -75,23 +75,23 @@ type Communications = M.Map Int (Maybe String)
 defaultCarState = CarState {
    z         = 0
   ,angle     = 0
-  ,gear'     = 1
-  ,trackPos  = 0
+  ,speedX    = 0
   ,speedY    = 0
-  ,distRaced = 0
   ,speedZ    = 0
+  ,rpm       = 0
+  ,distRaced = 0
+  ,lastLapTime = 0
+  ,curLapTime = 0
+  ,gear'     = 1
+  ,fuel      = 100
+  ,trackPos  = 0
+  ,track     = replicate 19 0
   ,damage    = 0
   ,wheelSpinVel = [0,0,0,0] -- length 4
-  ,focus     = [0]
-  ,track     = replicate 19 0
-  ,curLapTime = 0
-  ,speedX    = 0
+  ,focus'    = [0]
   ,racePos   = 1
-  ,fuel      = 100
   ,distFromStart = 0
   ,opponents = [0]
-  ,rpm       = 0
-  ,lastLapTime = 0
   ,lapTimes  = []
   ,communications = M.empty
   ,extra = ""

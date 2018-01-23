@@ -42,8 +42,11 @@ fromByteString s = let
   if (s=="***restart***\NUL" || s=="" || s=="***shutdown***\NUL")
   then defaultCarState --TODO, make this Nothing?
   else defaultCarState 
-     {angle = getField "angle", 
+     {
+      z = getField "z", 
+      angle = getField "angle", 
       speedX = getField "speedX", 
+      speedY = getField "speedY", 
       speedZ = getField "speedZ", 
       rpm = getField "rpm", 
       distRaced = getField "distRaced", 
@@ -53,7 +56,13 @@ fromByteString s = let
       fuel = getField "fuel", 
       trackPos = getField "trackPos",
       track = getList "track",
-      damage = getField "damage"}
+      damage = getField "damage",
+      wheelSpinVel = getList "wheelSpinVel",
+      focus' = map floor $ getList "focus",
+      racePos = floor $ getField "racePos",
+      distFromStart = getField "distFromStart",
+      opponents = getList "opponents"
+     }
 
 -- TODO someone has to have a better way of doing this
 readAsDouble :: ByteString -> Double
