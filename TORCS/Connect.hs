@@ -7,8 +7,8 @@ import Control.Concurrent.MVar
 
 import TORCS.Types
 import TORCS.Parser
---import TORCS.Connect.YampaRunner (startDriverWithPort)
-import TORCS.Connect.LolaRunner (startDriverWithPort)
+import TORCS.Connect.YampaRunner (startDriverWithPort)
+--import TORCS.Connect.LolaRunner (startDriverWithPort)
 
 -- | if starting a single driver, we dont need any communication channels (mvar)
 startDriver :: Driver -> IO(CarState, DriveState)
@@ -24,6 +24,7 @@ startGUIDriver d = startDriverWithPort True M.empty d 0 "3001"
 
 -- | To simulate platooning
 --   we create comm channels between all vehicles that we start
+--   Each car's channel is addressable with their cooresponding TORCS port
 -- TODO must seperate startTORCS IO from startDriverWtihPort to have everyone race in same torcs instance
 startDrivers  :: [Driver] -> IO()
 startDrivers ds = do

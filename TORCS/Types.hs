@@ -70,7 +70,7 @@ data CarState = CarState {
   ,extra          :: String
 } deriving (Show)
 
-type Communications = M.Map Int (Maybe String)
+type Communications = M.Map Int (Maybe Message)
 
 defaultCarState = CarState {
    z         = 0
