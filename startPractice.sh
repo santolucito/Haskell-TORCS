@@ -1,8 +1,0 @@
-xte 'key Return'
-xte 'key Down'
-xte 'key Down'
-xte 'key Down'
-xte 'key Down'
-xte 'key Down'
-xte 'key Return'
-xte 'key Return'

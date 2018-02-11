@@ -1,16 +1,15 @@
 {-# LANGUAGE Arrows #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RecordWildCards #-}
-module TORCS.Examples.SimpleExample where
+module Main where
 
 import FRP.Yampa
 
 import TORCS.Types
 import TORCS.Connect
-import Control.Concurrent
 
-simpleDrive :: IO ()
-simpleDrive = startDriver_ $ myDriver 100
+main :: IO ()
+main = startDriver_ $ myDriver 100
 
 myDriver :: Double -> Driver
 myDriver targetSpeed = proc e -> do

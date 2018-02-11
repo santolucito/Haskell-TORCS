@@ -3,15 +3,9 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module TORCS.Types where
 
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as B
 import qualified Data.Map as M
-import Data.Maybe 
 
 import FRP.Yampa
-
-import Debug.Trace
-traceMe x = traceShow x x 
 
 -- | A driver observes the environment and changes the drive state
 type Driver = SF (Event CarState) DriveState

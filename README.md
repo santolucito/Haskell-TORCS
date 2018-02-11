@@ -25,7 +25,8 @@ As an example, first open TORCS to a quick race and set the player to src_server
 Then on the command line run:
 
     $> cabal repl
-    ghci> simpleDrive
+    ghci> :l Examples/Simple.hs
+    ghci> main
 
 
 ### Using machine learning with TORCS

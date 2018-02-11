@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE MultiWayIf #-}
-module TORCS.Connect.YampaRunner (startDriverWithPort) where
+module TORCS.Connect.Runner (startDriverWithPort) where
 
 import Network.Socket hiding (sendTo,recvFrom)
 import Network.Socket.ByteString (sendTo,recvFrom)
@@ -25,6 +25,7 @@ import FRP.Yampa
 import TORCS.Types
 import TORCS.Parser
 import TORCS.Connect.Util
+import qualified TORCS.Monitor as M
 
 --NB torcs requires full path
 startDriverWithPort :: Bool -> M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
@@ -45,7 +46,7 @@ startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket conn
       sendTo sock mysteryString (addrAddress serveraddr) 
       return sock
 
-  
+
 --the id (port number) is used to choose this car's writing mvar
 yampaRunner :: Driver -> M.Map Int (MVar String) -> ServiceName -> Socket -> IO (CarState, DriveState)
 yampaRunner myDriver allChannels id conn = do
@@ -59,7 +60,7 @@ yampaRunner myDriver allChannels id conn = do
   print "Starting new driver"
   reactimate
     (return NoEvent)
-    (sense timeRef conn allChannels carRef)
+    (sense timeRef conn allChannels carRef driveRef M.monitorWrapper)
     (action conn addr (M.lookup myChannel allChannels) driveRef)
     myDriver
   --TODO clean this syntax
@@ -76,22 +77,26 @@ action conn d myBroadcastChan outRef _ msg = do
   bytesSent <- sendTo conn (toByteString msg) d 
   oldVal <- maybe (return Nothing) tryReadMVar myBroadcastChan
   _ <- maybe (return False) (\x -> if oldVal == (Just $ broadcast msg) then return False else mySwapMVar x (broadcast msg)) myBroadcastChan
+  --since our monitor needs updated DriveState in sense, we update the ref everytime now
+  writeIORef outRef msg
   --if we just sent a restart signal, end the reactimation (return True)
   --otherwise, continue (return False)
   if (meta msg == 1)
-  then writeIORef outRef msg >> return True 
+  then return True 
   else return False
   
 -- sensing will try to read from all the mvars, and add this info to CarState
 -- this only writes to the lapTimes part of CarState (not native to TORCS)
-sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> IORef CarState -> Bool -> IO (DTime, Maybe (Event CarState))
-sense timeRef conn chans carRef _ = do
+sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> IORef CarState -> IORef DriveState -> ((CarState,DriveState) -> IO String) -> Bool -> IO (DTime, Maybe (Event CarState))
+sense timeRef conn chans carRef driveRef monitorAction _ = do
   cur <- getCurrentTime
   (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> return ("",SockAddrUnix "")) --if nothing to sense from, get default value
   ms <- mapM tryReadMVar chans :: IO (M.Map Int (Maybe String))
   dt <- timediff timeRef cur
-  let rawCarState = (fromByteString msg){communications = ms}
   oldCarState <- readIORef carRef
+  oldDriveState <- readIORef driveRef
+  monitorInfo <- monitorAction (oldCarState,oldDriveState)
+  let rawCarState = (fromByteString msg){communications = ms,extra=monitorInfo}
   let carState = rawCarState{lapTimes = countLaps (lapTimes oldCarState, lastLapTime rawCarState)}
   --TODO this should not need to write everytime - find a way to detect when we are restarting and only save the carState then 
   writeIORef carRef carState
