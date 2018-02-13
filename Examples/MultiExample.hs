@@ -24,8 +24,7 @@ platoon = startDrivers [leader,follower]
 -- | the leader recievers the follwers current speed 
 --   and tells it to go faster or slower
 leader :: Driver
-leader = proc e -> do
-    CarState{..} <- arr getE -< e
+leader = proc CarState{..} -> do
     g <- arr shifting -< (rpm,gear')
     s <- arr steering -< (angle,trackPos)
     a <- arr gas -< (speedX,s)
@@ -81,9 +80,3 @@ steering (spd,trackPos) = let
   clip x = max (-1) $ min x 1
  in
   clip centering
-
-
-getE :: Event CarState -> CarState
-getE  e = case e of
-  NoEvent -> defaultCarState -- if no data, default
-  Event i -> i

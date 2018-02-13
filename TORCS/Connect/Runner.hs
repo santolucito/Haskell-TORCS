@@ -27,12 +27,19 @@ import TORCS.Parser
 import TORCS.Connect.Util
 import qualified TORCS.Monitor as M
 
---NB torcs requires full path
-startDriverWithPort :: Bool -> M.Map Int (MVar String) -> Driver -> Int -> ServiceName -> IO (CarState,DriveState)
+-- | The low level interface for connecting to TORCS. Usually, you should prefer to use "TORCS.Connect".
+startDriverWithPort :: 
+     Bool -- ^ Should we start the GUI for you
+  -> M.Map Int (MVar String) -- ^ Shared gloabl communications channel
+  -> Driver -- ^ the controller to start
+  -> Int  -- ^ the delay to allow TORCS to load before sending connection messages 
+  -> ServiceName -- ^ the port, should be in [3001..]
+  -> IO (CarState,DriveState)
 startDriverWithPort gui mvars myDriver delay port = withSocketsDo $ bracket connectMe close (yampaRunner myDriver mvars port)
   where
     connectMe = do
       homeDir <- getHomeDirectory
+      -- NB TORCS requires full path to config file
       unless gui $ createProcess (proc "torcs" ["-r "++homeDir++"/.torcs/config/raceman/practice.xml"]) {std_out = CreatePipe} >> return ()
       (serveraddr:_) <- getAddrInfo
                           (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
@@ -59,7 +66,7 @@ yampaRunner myDriver allChannels id conn = do
   (msg,addr) <- recvFrom conn 1024
   print "Starting new driver"
   reactimate
-    (return NoEvent)
+    (return defaultCarState)
     (sense timeRef conn allChannels carRef driveRef M.monitorWrapper)
     (action conn addr (M.lookup myChannel allChannels) driveRef)
     myDriver
@@ -68,9 +75,9 @@ yampaRunner myDriver allChannels id conn = do
   c <- readIORef carRef
   return (c,d)
 
--- action will do two things separately
--- first, send the drive instructions
--- second, broadcast the message to the other threads
+-- | action will do two things separately
+--   first, send the drive instructions
+--   second, broadcast the message to the other threads
 action :: Socket -> SockAddr -> Maybe (MVar String) -> IORef DriveState ->
           Bool -> DriveState -> IO Bool
 action conn d myBroadcastChan outRef _ msg = do
@@ -85,9 +92,9 @@ action conn d myBroadcastChan outRef _ msg = do
   then return True 
   else return False
   
--- sensing will try to read from all the mvars, and add this info to CarState
--- this only writes to the lapTimes part of CarState (not native to TORCS)
-sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> IORef CarState -> IORef DriveState -> ((CarState,DriveState) -> IO String) -> Bool -> IO (DTime, Maybe (Event CarState))
+-- | sensing will try to read from all the mvars, and add this info to CarState
+--   this only writes to the lapTimes part of CarState (not native to TORCS)
+sense :: IORef UTCTime -> Socket -> M.Map Int (MVar String) -> IORef CarState -> IORef DriveState -> ((CarState,DriveState) -> IO String) -> Bool -> IO (DTime, Maybe CarState)
 sense timeRef conn chans carRef driveRef monitorAction _ = do
   cur <- getCurrentTime
   (msg,d) <- catch (recvFrom conn 1024) (\(e :: SomeException) -> return ("",SockAddrUnix "")) --if nothing to sense from, get default value
@@ -96,8 +103,8 @@ sense timeRef conn chans carRef driveRef monitorAction _ = do
   oldCarState <- readIORef carRef
   oldDriveState <- readIORef driveRef
   monitorInfo <- monitorAction (oldCarState,oldDriveState)
-  let rawCarState = (fromByteString msg){communications = ms,extra=monitorInfo}
+  let rawCarState = (fromByteString msg){communications = ms,monitor=monitorInfo}
   let carState = rawCarState{lapTimes = countLaps (lapTimes oldCarState, lastLapTime rawCarState)}
   --TODO this should not need to write everytime - find a way to detect when we are restarting and only save the carState then 
   writeIORef carRef carState
-  return (dt, Just $ return carState) --TODO do i need the Event wrapper?
+  return (dt, Just $ carState) --TODO do i need the Event wrapper?

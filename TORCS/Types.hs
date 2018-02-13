@@ -8,22 +8,26 @@ import qualified Data.Map as M
 import FRP.Yampa
 
 -- | A driver observes the environment and changes the drive state
-type Driver = SF (Event CarState) DriveState
+type Driver = SF CarState DriveState
 
--- | The drive state dictates how we move around the world
---   see the TORCS manual for full description (https://arxiv.org/pdf/1304.1672)
+-- | The DriveState dictates how the controller actuators behave and, by extension, how the car moves around the world.
+--   See the TORCS manual for full description (<https://arxiv.org/pdf/1304.1672>)
 data DriveState = DriveState {
    gear      :: Int
   ,clutch    :: Double
   ,focus     :: [Int]
   ,accel     :: Double
-  ,meta      :: Int --0 or (1 restart race and end yampa loop)
+  -- | (0=continue) or (1=end simulation)
+  ,meta      :: Int 
   ,brakes    :: Double
   ,steer     :: Double
-  ,broadcast :: Message
+  -- | non-native to torcs
+  ,broadcast :: Message 
 } deriving (Show)
 
+-- | Broadcast messages are strings, but might be Text in the future
 type Message = String
+
 
 defaultDriveState = DriveState {
   gear   = 1
@@ -36,18 +40,21 @@ defaultDriveState = DriveState {
  ,broadcast = ""}
 
 
--- | car state is everything we can observe in the world
---   see the TORCS manual for full description (https://arxiv.org/pdf/1304.1672)
+-- | CarState is everything the controller can observe in the world.
+--   See the TORCS manual for full description (<https://arxiv.org/pdf/1304.1672>)
 data CarState = CarState {
    z              :: Double
   ,angle          :: Double
+  -- | /NB/: CarState uses prime version of identical DriveState field
   ,gear'          :: Int
   ,trackPos       :: Double
   ,speedY         :: Double
   ,distRaced      :: Double
   ,speedZ         :: Double
   ,damage         :: Double
-  ,wheelSpinVel   :: [Double] -- length 4
+  -- | length 4
+  ,wheelSpinVel   :: [Double] 
+  -- | /NB/: CarState uses prime version of identical DriveState field
   ,focus'         :: [Int]
   ,track          :: [Double]
   ,curLapTime     :: Double
@@ -58,12 +65,17 @@ data CarState = CarState {
   ,opponents      :: [Double] 
   ,rpm            :: Double
   ,lastLapTime    :: Double
-  ,lapTimes       :: [Double]
   --nonnative to torrcs
-  ,communications :: Communications
-  ,extra          :: String
+  -- | non-native to TORCS
+  ,lapTimes       :: [Double]
+  -- | non-native to TORCS
+  ,communications :: Communications 
+  -- | non-native to TORCS
+  ,monitor        :: String 
 } deriving (Show)
 
+-- | The global communications channel to read broadcasts from other vehicles.
+--   The port for each vehicle is the index into the map (ports start at 3001 in TORCS)
 type Communications = M.Map Int (Maybe Message)
 
 defaultCarState = CarState {
@@ -88,5 +100,5 @@ defaultCarState = CarState {
   ,opponents = [0]
   ,lapTimes  = []
   ,communications = M.empty
-  ,extra = ""
+  ,monitor = ""
 }

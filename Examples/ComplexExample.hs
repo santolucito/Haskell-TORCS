@@ -19,8 +19,7 @@ soloDrive = do
   return ()
 
 myDriver :: Double -> Driver
-myDriver maxSpeed = proc e -> do
-    CarState{..} <- arr getE -< e
+myDriver maxSpeed = proc CarState{..} -> do
     rec
        gear  <- arr shifting -< (rpm,gear')
        steer <- arr (steering 0) -< (track,angle,trackPos)
@@ -32,6 +31,7 @@ restarting :: Double -> (Double,Double) -> Int
 restarting s (lapT,ct) = 
   --if trace (show lapT++" "++show ct) $ lapT > 0 || ct > 200 then trace (show lapT++" - "++show s) 0 else 0
   0
+
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
   | rpm > 7000 -> min 6 (g+1)
@@ -79,8 +79,3 @@ gas targetSpeed (track,speed,steer,trackPos) = let
       | approachingTurn -> if speed > 120 then (0,(150-fd)/150) else (0.4,0)
       | otherwise       -> (1,0)
       
-  
-getE :: Event CarState -> CarState
-getE  e = case e of
-  NoEvent -> defaultCarState -- if no data, default
-  Event i -> i

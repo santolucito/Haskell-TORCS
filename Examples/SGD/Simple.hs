@@ -20,8 +20,7 @@ data Thetas = Thetas{
 makeLenses ''Thetas
 
 myDriver :: Thetas -> Driver
-myDriver Thetas{..} = proc e -> do
-    CarState{..} <- arr getE -< e
+myDriver Thetas{..} = proc CarState{..} -> do
     g <- arr shifting -< (rpm,gear')
     s <- arr (steering _turning) -< (angle,trackPos)
     a <- arr (gas _speed) -< (speedX,s)
@@ -44,8 +43,3 @@ steering turning (spd,trackPos) = let
 gas :: Double -> (Double,Double) -> Double
 gas targetSpeed (speed,steer) = 
   if speed < (targetSpeed-(steer*50)) then 0.5 else 0
-  
-getE :: Event CarState -> CarState
-getE  e = case e of
-  NoEvent -> defaultCarState -- if no data, default
-  Event i -> i

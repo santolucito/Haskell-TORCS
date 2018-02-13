@@ -6,7 +6,7 @@ import FRP.Yampa (DTime)
 import Data.Time.Clock
 import Control.Concurrent
 
---A small wrapper to keep track of how long each lap took
+-- | A small wrapper to keep track of how long each lap took
 countLaps :: ([Double],Double) -> [Double]
 countLaps (lapTs,lastT) = if 
   | lastT == 0 -> []

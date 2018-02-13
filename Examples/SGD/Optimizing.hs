@@ -48,9 +48,8 @@ calcCost (c, d) =
   (damage c) + (sum $ lapTimes c)
 
 threeLapDriver :: Thetas -> Driver
-threeLapDriver t = proc e -> do
-  CarState{..} <- arr getE -< e
-  driveState <- myDriver t -< e
+threeLapDriver t = proc c@CarState{..} -> do
+  driveState <- myDriver t -< c
   m <- arr restarting -< (lapTimes,curLapTime)
   returnA -< driveState {meta = m}
 

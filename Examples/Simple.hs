@@ -5,19 +5,20 @@ module Main where
 
 import FRP.Yampa
 
-import TORCS.Types
-import TORCS.Connect
+import TORCS
+
+import Debug.Trace
 
 main :: IO ()
-main = startDriver_ $ myDriver 100
+main = (startDriver $ myDriver 100) >>= print 
 
 myDriver :: Double -> Driver
-myDriver targetSpeed = proc e -> do
-    CarState{..} <- arr getE -< e
+myDriver targetSpeed = proc CarState{..} -> do
     g <- arr shifting -< (rpm,gear')
     s <- arr steering -< (angle,trackPos)
     a <- arr (gas targetSpeed) -< (speedX,s)
-    returnA -< defaultDriveState {accel = a, gear = g, steer = s}
+    m <- arr endRace -< (lapTimes,curLapTime)
+    returnA -< defaultDriveState {accel = a, gear = g, steer = s, meta = m}
 
 shifting :: (Double,Int) -> Int
 shifting (rpm,g) = if 
@@ -36,8 +37,10 @@ steering (spd,trackPos) = let
 gas :: Double -> (Double,Double) -> Double
 gas targetSpeed (speed,steer) = 
   if speed < (targetSpeed-(steer*50)) then 0.5 else 0
-  
-getE :: Event CarState -> CarState
-getE  e = case e of
-  NoEvent -> defaultCarState -- if no data, default
-  Event i -> i
+
+-- | Run 3 laps then stop the simulation
+endRace :: ([Double],Double) -> Int
+endRace (lapTs,ct) = 
+    if (length lapTs >= 2) || ct > timeout then 1 else 0
+  where
+    timeout = 200
