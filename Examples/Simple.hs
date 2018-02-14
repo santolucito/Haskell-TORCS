@@ -10,7 +10,7 @@ import TORCS
 import Debug.Trace
 
 main :: IO ()
-main = (startDriver $ myDriver 100) >>= print 
+main = (startGUIDriver $ myDriver 100) >>= print 
 
 myDriver :: Double -> Driver
 myDriver targetSpeed = proc CarState{..} -> do

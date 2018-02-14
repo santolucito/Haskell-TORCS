@@ -16,7 +16,8 @@ import Debug.Trace
 
 
 
--- | Start multiple drivers
+-- | Start multiple drivers 
+--   (For now you need the GUI open, and to be in quick race mode with the correct number of 'src_server's in the race) 
 --   each has a comm channel labelled starting at 3001
 platoon = startDrivers [leader,follower]
 
@@ -42,8 +43,7 @@ getFollowerSpeed comm = let
 -- | the follower controls thier own vehicle
 --   but recieves extra speed instructions from the leader
 follower :: Driver
-follower = proc e -> do
-    CarState{..} <- arr getE -< e
+follower = proc CarState{..} -> do
     g <- arr shifting -< (rpm,gear')
     s <- arr steering -< (angle,trackPos)
     a' <- arr gas -< (speedX,s)
