@@ -2,8 +2,8 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TORCS
-version:             0.1.0.0
--- synopsis:            
+version:             0.1.0.2
+synopsis:            Bindings to the TORCS vehicle simulator.
 description:         
   A library for building autonomous vehicles that run in the TORCS simulator. This requires the following external dependencies:
   .
@@ -22,7 +22,7 @@ license-file:        LICENSE
 author:              Mark Santolucito
 maintainer:          mark.santolucito@yale.edu
 -- copyright:           
-category:            Game
+category:            Simulation, FRP, Bindings
 build-type:          Simple
 extra-source-files:  ChangeLog.md, README
 cabal-version:       >=1.10
