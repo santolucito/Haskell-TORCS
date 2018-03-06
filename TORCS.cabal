@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TORCS
-version:             0.1.0.2
+version:             0.1.1
 synopsis:            Bindings to the TORCS vehicle simulator.
 description:         
   A library for building autonomous vehicles that run in the TORCS simulator. This requires the following external dependencies:
@@ -35,11 +35,12 @@ library
   exposed-modules:     
      TORCS
    , TORCS.Types
+   , TORCS.Monitor
    , TORCS.Connect
    , TORCS.Connect.Runner
+   , TORCS.Parser
   other-modules:  
      TORCS.Connect.Util     
-   , TORCS.Parser
   other-extensions:    Arrows, OverloadedStrings
   build-depends:       base >=4.9 && <4.11, 
                        time >=1.6 && <1.7,
